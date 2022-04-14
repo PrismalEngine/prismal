@@ -1,11 +1,12 @@
 use prismal_app_core::traits::AppCore;
+use prismal_utils::{interior_mut::InteriorMut, shared::RefMut};
 use prismal_window::prelude::Window;
 
 pub struct GfxState {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface: wgpu::Surface,
-    pub surface_config: wgpu::SurfaceConfiguration,
+    pub surface_config: RefMut<wgpu::SurfaceConfiguration>,
 }
 
 impl GfxState {
@@ -52,8 +53,15 @@ impl GfxState {
             surface,
             device,
             queue,
-            surface_config,
+            surface_config: RefMut::new(surface_config),
         }
+    }
+
+    pub fn resize(&self, width: u32, height: u32) {
+        let mut surface_config = self.surface_config.borrow_int_mut().unwrap();
+        surface_config.width = width;
+        surface_config.height = height;
+        self.surface.configure(&self.device, &surface_config);
     }
 
     pub fn render(&self) -> Result<(), wgpu::SurfaceError> {

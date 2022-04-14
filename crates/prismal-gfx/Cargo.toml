@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 prismal-app-core = { version = "0.1.0", path = "../prismal-app-core" }
+prismal-utils = { version = "0.1.0", path = "../prismal-utils" }
 prismal-window = { version = "0.1.0", path = "../prismal-window" }
 
 cfg-if = "1"
