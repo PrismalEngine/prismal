@@ -1,8 +1,9 @@
 use prismal_app_core::traits::AppCore;
+use prismal_gfx::prelude::*;
 use prismal_window::prelude::*;
 
 pub fn handle_event<A: AppCore + 'static>(
-    _app: &mut A,
+    app: &mut A,
     event: WinitEvent<()>,
     flow: &mut ControlFlow,
 ) {
@@ -13,7 +14,18 @@ pub fn handle_event<A: AppCore + 'static>(
             }
             _ => {}
         },
-        WinitEvent::MainEventsCleared => {}
+        WinitEvent::MainEventsCleared => {
+            let gfx = app.resources().get::<GfxState>().unwrap();
+            match gfx.render() {
+                Err(err) => match err {
+                    SurfaceError::Timeout => todo!(),
+                    SurfaceError::Outdated => todo!(),
+                    SurfaceError::Lost => todo!(),
+                    SurfaceError::OutOfMemory => todo!(),
+                },
+                _ => {}
+            }
+        }
         _ => {}
     }
 }

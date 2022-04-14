@@ -1,4 +1,5 @@
 use prismal_app_core::traits::{AppCore, AppFactory};
+use prismal_gfx::state::GfxState;
 use prismal_platform_init::init::initialize_platform;
 use prismal_window::prelude::*;
 
@@ -11,6 +12,9 @@ pub async fn entry<A: AppCore + AppFactory + 'static>() {
     let event_loop = EventLoop::new();
     let window = initialize_window(app.as_ref(), &event_loop);
     app.resources_mut().insert_unsync(window);
+
+    let gfx = GfxState::new(app.as_ref()).await;
+    app.resources_mut().insert(gfx);
 
     app.start();
 

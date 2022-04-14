@@ -1,0 +1,16 @@
+[package]
+name = "prismal-gfx"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prismal-app-core = { version = "0.1.0", path = "../prismal-app-core" }
+prismal-window = { version = "0.1.0", path = "../prismal-window" }
+
+cfg-if = "1"
+wgpu = { version = "0.12", features = ["spirv"] }
+
+[target.'cfg(target_arch="wasm32")'.dependencies]
+wgpu = { version = "0.12", features = ["spirv", "webgl"] }
