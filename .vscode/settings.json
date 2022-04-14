@@ -4,6 +4,9 @@
     },
     "cSpell.words": [
         "prismal",
+        "unsync",
+        "webgl",
+        "wgpu",
         "Winit"
     ]
 }
