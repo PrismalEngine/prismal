@@ -28,8 +28,8 @@ impl AppCore for SandboxApp {
 }
 
 impl AppFactory for SandboxApp {
-    fn make_app() -> Box<Self> {
-        Box::new(Self {
+    fn make_app() -> UnsyncRcMut<Self> {
+        unsync_rc_mut(Self {
             resources: AppResources::new(),
         })
     }

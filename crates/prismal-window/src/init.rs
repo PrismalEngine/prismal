@@ -1,8 +1,13 @@
 use prismal_app_core::traits::AppCore;
+use prismal_utils::interior_mut::InteriorMut;
+use prismal_utils::shared::UnsyncRcMut;
+
 use winit::event_loop::EventLoop;
 use winit::window::{Window, WindowBuilder};
 
-pub fn initialize_window<A: AppCore>(app: &A, event_loop: &EventLoop<()>) -> Window {
+pub fn initialize_window<A: AppCore>(app: UnsyncRcMut<A>, event_loop: &EventLoop<()>) -> Window {
+    let app = app.borrow_int_mut().unwrap();
+
     let info = app.info();
     let window = WindowBuilder::new()
         .with_title(info.label)

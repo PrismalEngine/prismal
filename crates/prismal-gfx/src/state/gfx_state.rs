@@ -1,5 +1,8 @@
 use prismal_app_core::traits::AppCore;
-use prismal_utils::{interior_mut::InteriorMut, shared::RefMut};
+use prismal_utils::{
+    interior_mut::InteriorMut,
+    shared::{RefMut, UnsyncRcMut},
+};
 use prismal_window::prelude::Window;
 
 pub struct GfxState {
@@ -10,7 +13,8 @@ pub struct GfxState {
 }
 
 impl GfxState {
-    pub async fn new<A: AppCore>(app: &A) -> Self {
+    pub async fn new<A: AppCore>(app: UnsyncRcMut<A>) -> Self {
+        let app = app.borrow_int_mut().unwrap();
         let window = app.resources().get_unsync::<Window>().unwrap();
         let size = window.inner_size();
         let size = (size.width, size.height);
