@@ -9,6 +9,7 @@ edition = "2021"
 prismal-app-core = { version = "0.1.0", path = "crates/prismal-app-core" }
 prismal-entry = { version = "0.1.0", path = "crates/prismal-entry" }
 prismal-gfx = { version = "0.1.0", path = "crates/prismal-gfx" }
+prismal-math = { version = "0.1.0", path = "crates/prismal-math" }
 prismal-utils = { version = "0.1.0", path = "crates/prismal-utils" }
 
 
