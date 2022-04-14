@@ -1,0 +1,9 @@
+{
+    "[rust]": {
+        "editor.formatOnSave": true
+    },
+    "cSpell.words": [
+        "prismal",
+        "Winit"
+    ]
+}

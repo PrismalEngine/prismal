@@ -1,0 +1,13 @@
+[package]
+name = "prismal-entry"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prismal-app-core = {version = "0.1.0", path = "../prismal-app-core"}
+prismal-platform-init = {version = "0.1.0", path = "../prismal-platform-init"}
+prismal-window = {version = "0.1.0", path = "../prismal-window"}
+
+log = "0.4"
