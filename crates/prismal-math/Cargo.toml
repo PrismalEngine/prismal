@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 glam = { version = "0.20", features = ["serde", "approx"] }
 approx = "0.5"
+num-traits = "0.2"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

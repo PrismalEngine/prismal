@@ -1,5 +1,6 @@
 pub use crate::matrix::*;
 pub use crate::quat::*;
+pub use crate::scalar::*;
 pub use crate::vector::*;
 
 pub use crate::approx::AbsDiffEq;
