@@ -11,7 +11,8 @@ prismal-utils = { version = "0.1.0", path = "../prismal-utils" }
 prismal-window = { version = "0.1.0", path = "../prismal-window" }
 
 cfg-if = "1"
-wgpu = { version = "0.12", features = ["spirv"] }
+wgpu = { version = "0.12", git = "https://github.com/gfx-rs/wgpu.git" }
+thiserror = "1.0"
 
 [target.'cfg(target_arch="wasm32")'.dependencies]
-wgpu = { version = "0.12", features = ["spirv", "webgl"] }
+wgpu = { version = "0.12", git="https://github.com/gfx-rs/wgpu.git", features = ["webgl"] }
