@@ -10,22 +10,31 @@ pub struct GfxState {
 }
 
 impl GfxState {
-    pub async fn new(app: UnsyncRcMut<dyn AppCore>) -> Self {
-        let app_ref = app.borrow();
-        let window = app_ref.resources().get_unsync::<Window>().unwrap();
-        let size = window.inner_size();
-        let size = (size.width, size.height);
-
+    pub async fn new<A: AppCore>(app: UnsyncRcMut<A>) -> Self {
         let instance = wgpu::Instance::new(wgpu::Backends::all());
-        let surface = unsafe { instance.create_surface(window) };
-        let adapter = instance
-            .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: wgpu::PowerPreference::default(),
-                compatible_surface: Some(&surface),
-                force_fallback_adapter: false,
-            })
-            .await
-            .unwrap();
+
+        let (adapter, surface, size) = async {
+            let app_ref = app.borrow_int_mut().unwrap();
+            let window = app_ref.resources().get_unsync::<Window>().unwrap();
+            let size = window.inner_size();
+            let size = (size.width, size.height);
+            let surface = unsafe { instance.create_surface(window) };
+            let compatible_surface = Some(&surface);
+            (
+                instance
+                    .request_adapter(&wgpu::RequestAdapterOptions {
+                        power_preference: wgpu::PowerPreference::default(),
+                        compatible_surface,
+                        force_fallback_adapter: false,
+                    })
+                    .await
+                    .unwrap(),
+                surface,
+                size,
+            )
+        }
+        .await;
+
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {

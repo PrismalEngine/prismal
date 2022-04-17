@@ -4,10 +4,12 @@
     },
     "cSpell.words": [
         "prismal",
+        "unclipped",
         "unsync",
         "webgl",
         "wgpu",
         "Wgsl",
         "Winit"
-    ]
+    ],
+    "rust-analyzer.checkOnSave.command": "clippy"
 }

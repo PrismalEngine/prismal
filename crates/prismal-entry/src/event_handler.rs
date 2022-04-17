@@ -50,8 +50,8 @@ pub fn handle_event<A: AppCore + 'static>(
         },
         WinitEvent::MainEventsCleared => {
             let gfx = app.resources().get::<GfxState>().unwrap();
-            match gfx.render() {
-                Err(err) => match err {
+            if let Err(err) = gfx.render() {
+                match err {
                     SurfaceError::Outdated | SurfaceError::Lost => resize_gfx_current(app),
                     SurfaceError::OutOfMemory => {
                         log::error!("GPU out of memory!");
@@ -61,8 +61,7 @@ pub fn handle_event<A: AppCore + 'static>(
                         log::error!("Surface Error: {:?}", err);
                         panic!("{:?}", err);
                     }
-                },
-                _ => {}
+                }
             }
         }
         _ => {}
