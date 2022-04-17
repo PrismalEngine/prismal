@@ -2,12 +2,23 @@ use prismal_app_core::traits::AppCore;
 use prismal_utils::{interior_mut::InteriorMut, shared::*};
 use prismal_window::prelude::Window;
 
+#[cfg(target_arch = "wasm")]
+type BoxedRenderCallback = (dyn FnMut(&mut wgpu::RenderPass));
+
+#[cfg(not(target_arch = "wasm"))]
+type BoxedRenderCallback = (dyn FnMut(&mut wgpu::RenderPass) + Send);
+
+fn default_render_callback(_rp: &mut wgpu::RenderPass) {}
+
 pub struct GfxState {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface: wgpu::Surface,
     pub surface_config: RefMut<wgpu::SurfaceConfiguration>,
+    callback: SyncRc<SyncRefMut<BoxedRenderCallback>>,
 }
+pub trait DoubleCaptures<'a, 'b: 'a> {}
+impl<'a, 'b: 'a, T: ?Sized> DoubleCaptures<'a, 'b> for T {}
 
 impl GfxState {
     pub async fn new<A: AppCore>(app: UnsyncRcMut<A>) -> Self {
@@ -64,7 +75,15 @@ impl GfxState {
             device,
             queue,
             surface_config: RefMut::new(surface_config),
+            callback: SyncRc::new(SyncRefMut::new(default_render_callback)),
         }
+    }
+
+    pub fn set_render_callback(
+        &mut self,
+        f: impl for<'r, 's> FnMut(&'r mut wgpu::RenderPass<'s>) + Send + 'static,
+    ) {
+        self.callback = SyncRc::new(SyncRefMut::new(f));
     }
 
     pub fn resize(&self, width: u32, height: u32) {
@@ -85,7 +104,7 @@ impl GfxState {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
 
         {
-            let _rp = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let mut rp = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[wgpu::RenderPassColorAttachment {
                     view: &view,
@@ -97,6 +116,10 @@ impl GfxState {
                 }],
                 depth_stencil_attachment: None,
             });
+            {
+                let mut cb = self.callback.lock().unwrap();
+                (cb)(&mut rp);
+            }
         }
 
         self.queue.submit(Some(encoder.finish()));

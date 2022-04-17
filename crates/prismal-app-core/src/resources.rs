@@ -54,6 +54,14 @@ impl AppResources {
             None
         }
     }
+    pub fn get_mut<T: SyncAppResource>(&mut self) -> Option<&mut T> {
+        let tid = TypeId::of::<T>();
+        if let Some(r) = self.sync_resources.get_mut(&tid) {
+            Rc::get_mut(r).and_then(|r| r.downcast_mut().ok())
+        } else {
+            None
+        }
+    }
     pub fn get_unsync<T: Any + 'static>(&self) -> Option<&T> {
         let tid = TypeId::of::<T>();
         if let Some(r) = self.unsync_resources.get(&tid) {

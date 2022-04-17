@@ -14,10 +14,10 @@ pub struct RenderPipelineBuilder<'a> {
 
     shader_source: Option<&'a str>,
     vertex_entry: &'a str,
-    fragment_entry: &'a str,
+    fragment_entry: Option<&'a str>,
 
-    vertex_buffers: Option<&'a [wgpu::VertexBufferLayout<'a>]>,
-    color_targets: Option<&'a [wgpu::ColorTargetState]>,
+    vertex_buffers: Vec<wgpu::VertexBufferLayout<'a>>,
+    color_targets: Vec<wgpu::ColorTargetState>,
 
     topology: wgpu::PrimitiveTopology,
     cull_mode: Option<wgpu::Face>,
@@ -42,9 +42,9 @@ impl<'a> RenderPipelineBuilder<'a> {
             layout: None,
             shader_source: None,
             vertex_entry: "vs_main",
-            fragment_entry: "fs_main",
-            vertex_buffers: None,
-            color_targets: None,
+            fragment_entry: Some("fs_main"),
+            vertex_buffers: Vec::new(),
+            color_targets: Vec::new(),
             topology: wgpu::PrimitiveTopology::TriangleList,
             cull_mode: Some(wgpu::Face::Back),
             front_face: wgpu::FrontFace::Ccw,
@@ -53,69 +53,64 @@ impl<'a> RenderPipelineBuilder<'a> {
         }
     }
 
-    pub fn with_label(self, value: Option<&'a str>) -> Self {
+    pub fn with_label(self, label: Option<&'a str>) -> Self {
+        Self { label, ..self }
+    }
+
+    pub fn with_shader_source(self, shader_source: &'a str) -> Self {
         Self {
-            label: value,
+            shader_source: Some(shader_source),
             ..self
         }
     }
-    pub fn with_vertex_entry(self, value: &'a str) -> Self {
+    pub fn with_vertex_entry_fn(self, entry_name: &'a str) -> Self {
         Self {
-            vertex_entry: value,
+            vertex_entry: entry_name,
             ..self
         }
     }
-    pub fn with_fragment_entry(self, value: &'a str) -> Self {
+    pub fn with_fragment_entry_fn(self, entry_name: Option<&'a str>) -> Self {
         Self {
-            fragment_entry: value,
+            fragment_entry: entry_name,
             ..self
         }
     }
-    pub fn with_vertex_buffers(self, value: &'a [wgpu::VertexBufferLayout<'a>]) -> Self {
+    pub fn push_vertex_buffer_layout(
+        mut self,
+        buffer_layout: wgpu::VertexBufferLayout<'a>,
+    ) -> Self {
+        self.vertex_buffers.push(buffer_layout);
+        self
+    }
+
+    pub fn push_color_target(mut self, target: wgpu::ColorTargetState) -> Self {
+        self.color_targets.push(target);
+        self
+    }
+    pub fn with_topology(self, topology: wgpu::PrimitiveTopology) -> Self {
+        Self { topology, ..self }
+    }
+    pub fn with_cull_mode(self, cull_mode: Option<wgpu::Face>) -> Self {
+        Self { cull_mode, ..self }
+    }
+    pub fn with_front_face(self, front_face: wgpu::FrontFace) -> Self {
+        Self { front_face, ..self }
+    }
+    pub fn with_polygon_mode(self, polygon_mode: wgpu::PolygonMode) -> Self {
         Self {
-            vertex_buffers: Some(value),
+            polygon_mode,
             ..self
         }
     }
-    pub fn with_color_targets(self, value: &'a [wgpu::ColorTargetState]) -> Self {
+    pub fn with_depth_enabled(self, depth_enabled: bool) -> Self {
         Self {
-            color_targets: Some(value),
+            depth_enabled,
             ..self
         }
     }
-    pub fn with_topology(self, value: wgpu::PrimitiveTopology) -> Self {
+    pub fn with_layout(self, layout: &'a wgpu::PipelineLayout) -> Self {
         Self {
-            topology: value,
-            ..self
-        }
-    }
-    pub fn with_cull_mode(self, value: wgpu::Face) -> Self {
-        Self {
-            cull_mode: Some(value),
-            ..self
-        }
-    }
-    pub fn with_front_face(self, value: wgpu::FrontFace) -> Self {
-        Self {
-            front_face: value,
-            ..self
-        }
-    }
-    pub fn with_polygon_mode(self, value: wgpu::PolygonMode) -> Self {
-        Self {
-            polygon_mode: value,
-            ..self
-        }
-    }
-    pub fn with_depth_enabled(self, value: bool) -> Self {
-        Self {
-            depth_enabled: value,
-            ..self
-        }
-    }
-    pub fn with_layout(self, value: &'a wgpu::PipelineLayout) -> Self {
-        Self {
-            layout: Some(value),
+            layout: Some(layout),
             ..self
         }
     }
@@ -133,27 +128,26 @@ impl<'a> RenderPipelineBuilder<'a> {
         let shader_source = self
             .shader_source
             .ok_or_else(|| PipelineBuilderError::MissingField("shader_source".into()))?;
-        let vertex_entry = self.vertex_entry;
-        let fragment_entry = self.fragment_entry;
 
         let shader_module = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
             label: Some("Shader Module"),
             source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(shader_source)),
         });
 
-        let vertex_buffers = self.vertex_buffers.unwrap_or(&[]);
+        let vertex_buffers = &self.vertex_buffers[..];
         let vertex = wgpu::VertexState {
             module: &shader_module,
-            entry_point: vertex_entry,
+            entry_point: self.vertex_entry,
             buffers: vertex_buffers,
         };
 
-        let color_targets = self.color_targets.unwrap_or(&[]);
-        let fragment = Some(wgpu::FragmentState {
-            module: &shader_module,
-            entry_point: fragment_entry,
-            targets: color_targets,
-        });
+        let fragment = self
+            .fragment_entry
+            .map(|fragment_entry| wgpu::FragmentState {
+                module: &shader_module,
+                entry_point: fragment_entry,
+                targets: &self.color_targets[..],
+            });
 
         let primitive = wgpu::PrimitiveState {
             topology: self.topology,
