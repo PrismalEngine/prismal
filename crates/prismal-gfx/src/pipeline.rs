@@ -9,7 +9,7 @@ pub enum PipelineBuilderError {
 }
 
 #[derive(Debug, Clone)]
-pub struct PipelineBuilder<'a> {
+pub struct RenderPipelineBuilder<'a> {
     label: Option<&'a str>,
 
     shader_source: Option<&'a str>,
@@ -29,8 +29,14 @@ pub struct PipelineBuilder<'a> {
     depth_enabled: bool,
 }
 
-impl<'a> Default for PipelineBuilder<'a> {
+impl<'a> Default for RenderPipelineBuilder<'a> {
     fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> RenderPipelineBuilder<'a> {
+    pub fn new() -> Self {
         Self {
             label: None,
             layout: None,
@@ -46,9 +52,7 @@ impl<'a> Default for PipelineBuilder<'a> {
             depth_enabled: false,
         }
     }
-}
 
-impl<'a> PipelineBuilder<'a> {
     pub fn with_label(self, value: Option<&'a str>) -> Self {
         Self {
             label: value,
