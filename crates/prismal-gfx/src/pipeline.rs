@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -10,10 +12,11 @@ pub enum PipelineBuilderError {
 pub struct PipelineBuilder<'a> {
     label: Option<&'a str>,
 
-    vertex_module: Option<(&'a wgpu::ShaderModule, &'a str)>,
-    vertex_buffers: Option<&'a [wgpu::VertexBufferLayout<'a>]>,
+    shader_source: Option<&'a str>,
+    vertex_entry: &'a str,
+    fragment_entry: &'a str,
 
-    fragment_module: Option<(&'a wgpu::ShaderModule, &'a str)>,
+    vertex_buffers: Option<&'a [wgpu::VertexBufferLayout<'a>]>,
     color_targets: Option<&'a [wgpu::ColorTargetState]>,
 
     topology: wgpu::PrimitiveTopology,
@@ -31,9 +34,10 @@ impl<'a> Default for PipelineBuilder<'a> {
         Self {
             label: None,
             layout: None,
-            vertex_module: None,
+            shader_source: None,
+            vertex_entry: "vs_main",
+            fragment_entry: "fs_main",
             vertex_buffers: None,
-            fragment_module: None,
             color_targets: None,
             topology: wgpu::PrimitiveTopology::TriangleList,
             cull_mode: Some(wgpu::Face::Back),
@@ -51,21 +55,21 @@ impl<'a> PipelineBuilder<'a> {
             ..self
         }
     }
-    pub fn with_vertex_module(self, shader: &'a wgpu::ShaderModule, entry: &'a str) -> Self {
+    pub fn with_vertex_entry(self, value: &'a str) -> Self {
         Self {
-            vertex_module: Some((shader, entry)),
+            vertex_entry: value,
+            ..self
+        }
+    }
+    pub fn with_fragment_entry(self, value: &'a str) -> Self {
+        Self {
+            fragment_entry: value,
             ..self
         }
     }
     pub fn with_vertex_buffers(self, value: &'a [wgpu::VertexBufferLayout<'a>]) -> Self {
         Self {
             vertex_buffers: Some(value),
-            ..self
-        }
-    }
-    pub fn with_fragment_module(self, shader: &'a wgpu::ShaderModule, entry: &'a str) -> Self {
-        Self {
-            fragment_module: Some((shader, entry)),
             ..self
         }
     }
@@ -121,15 +125,32 @@ impl<'a> PipelineBuilder<'a> {
             self.layout
                 .ok_or_else(|| PipelineBuilderError::MissingField("layout".into()))?,
         );
-        let vertex_module = self
-            .vertex_module
-            .ok_or_else(|| PipelineBuilderError::MissingField("vertex_module".into()))?;
+
+        let shader_source = self
+            .shader_source
+            .ok_or_else(|| PipelineBuilderError::MissingField("shader_source".into()))?;
+        let vertex_entry = self.vertex_entry;
+        let fragment_entry = self.fragment_entry;
+
+        let shader_module = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
+            label: Some("Shader Module"),
+            source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(shader_source)),
+        });
+
         let vertex_buffers = self.vertex_buffers.unwrap_or(&[]);
         let vertex = wgpu::VertexState {
-            module: vertex_module.0,
-            entry_point: vertex_module.1,
+            module: &shader_module,
+            entry_point: vertex_entry,
             buffers: vertex_buffers,
         };
+
+        let color_targets = self.color_targets.unwrap_or(&[]);
+        let fragment = Some(wgpu::FragmentState {
+            module: &shader_module,
+            entry_point: fragment_entry,
+            targets: color_targets,
+        });
+
         let primitive = wgpu::PrimitiveState {
             topology: self.topology,
             strip_index_format: None,
@@ -141,7 +162,7 @@ impl<'a> PipelineBuilder<'a> {
         };
         let depth_stencil = if self.depth_enabled {
             Some(wgpu::DepthStencilState {
-                format: wgpu::TextureFormat::Depth24Plus,
+                format: wgpu::TextureFormat::Depth32Float,
                 depth_write_enabled: true,
                 depth_compare: wgpu::CompareFunction::Less,
                 stencil: wgpu::StencilState::default(),
@@ -156,17 +177,6 @@ impl<'a> PipelineBuilder<'a> {
             mask: !0,
             alpha_to_coverage_enabled: false,
         };
-
-        let fragment_module = self
-            .fragment_module
-            .ok_or_else(|| PipelineBuilderError::MissingField("fragment_module".into()))?;
-        let color_targets = self.color_targets.unwrap_or(&[]);
-
-        let fragment = Some(wgpu::FragmentState {
-            module: fragment_module.0,
-            entry_point: fragment_module.1,
-            targets: color_targets,
-        });
 
         Ok(
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {

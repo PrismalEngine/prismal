@@ -1,58 +1,18 @@
-use std::borrow::Cow;
-
 use prismal_app_core::traits::AppCore;
-use prismal_utils::{
-    interior_mut::InteriorMut,
-    shared::{RefMut, UnsyncRcMut},
-};
+use prismal_utils::{interior_mut::InteriorMut, shared::*};
 use prismal_window::prelude::Window;
-
-use crate::pipeline::{PipelineBuilder, PipelineBuilderError};
-
-pub fn make_triangle_pipeline<D>(
-    device: D,
-    surface_format: wgpu::TextureFormat,
-) -> Result<wgpu::RenderPipeline, PipelineBuilderError>
-where
-    D: std::ops::Deref<Target = wgpu::Device>,
-{
-    let wgsl = include_str!("../../assets/triangle.wgsl");
-
-    let shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
-        label: None,
-        source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(wgsl)),
-    });
-
-    let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-        label: None,
-        bind_group_layouts: &[],
-        push_constant_ranges: &[],
-    });
-    PipelineBuilder::default()
-        .with_layout(&layout)
-        .with_vertex_module(&shader, "vs_main")
-        .with_fragment_module(&shader, "fs_main")
-        .with_color_targets(&[wgpu::ColorTargetState {
-            format: surface_format,
-            blend: Some(wgpu::BlendState::REPLACE),
-            write_mask: wgpu::ColorWrites::ALL,
-        }])
-        .build(device)
-}
 
 pub struct GfxState {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface: wgpu::Surface,
     pub surface_config: RefMut<wgpu::SurfaceConfiguration>,
-
-    triangle_pipeline: wgpu::RenderPipeline,
 }
 
 impl GfxState {
-    pub async fn new<A: AppCore>(app: UnsyncRcMut<A>) -> Self {
-        let app = app.borrow_int_mut().unwrap();
-        let window = app.resources().get_unsync::<Window>().unwrap();
+    pub async fn new(app: UnsyncRcMut<dyn AppCore>) -> Self {
+        let app_ref = app.borrow();
+        let window = app_ref.resources().get_unsync::<Window>().unwrap();
         let size = window.inner_size();
         let size = (size.width, size.height);
 
@@ -89,14 +49,12 @@ impl GfxState {
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &surface_config);
-        let triangle_pipeline = make_triangle_pipeline(&device, surface_config.format).unwrap();
 
         Self {
             surface,
             device,
             queue,
             surface_config: RefMut::new(surface_config),
-            triangle_pipeline,
         }
     }
 
@@ -118,7 +76,7 @@ impl GfxState {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
 
         {
-            let mut rp = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let _rp = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[wgpu::RenderPassColorAttachment {
                     view: &view,
@@ -130,8 +88,6 @@ impl GfxState {
                 }],
                 depth_stencil_attachment: None,
             });
-            rp.set_pipeline(&self.triangle_pipeline);
-            rp.draw(0..3, 0..1);
         }
 
         self.queue.submit(Some(encoder.finish()));
