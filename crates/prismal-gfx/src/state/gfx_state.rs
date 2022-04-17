@@ -1,5 +1,6 @@
 use prismal_app_core::traits::AppCore;
-use prismal_utils::{interior_mut::InteriorMut, shared::*};
+use prismal_utils::interior_mut::InteriorMut;
+use prismal_utils::shared::*;
 use prismal_window::prelude::Window;
 
 #[cfg(target_arch = "wasm")]
@@ -117,7 +118,7 @@ impl GfxState {
                 depth_stencil_attachment: None,
             });
             {
-                let mut cb = self.callback.lock().unwrap();
+                let mut cb = self.callback.lock();
                 (cb)(&mut rp);
             }
         }
