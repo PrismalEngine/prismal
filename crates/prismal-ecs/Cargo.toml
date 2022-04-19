@@ -1,0 +1,12 @@
+[package]
+name = "prismal-ecs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prismal-ecs-core = { version = "0.1.0", path = "../prismal-ecs-core" }
+prismal-math = { version = "0.1.0", path = "../prismal-math" }
+
+educe = "0.4"
