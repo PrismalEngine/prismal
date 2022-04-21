@@ -11,10 +11,10 @@ struct SandboxApp {
 }
 
 #[rustfmt::skip]
-const VERTICES: &[BasicVertex3d] = &[
-    BasicVertex3d::new([0.0,   0.5, 0.0], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]),
-    BasicVertex3d::new([-0.5, -0.5, 0.0], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]),
-    BasicVertex3d::new([0.5,  -0.5, 0.0], [1.0, 1.0],[0.0, 0.0, 1.0, 1.0]),
+const VERTICES: &[BasicVertex2d] = &[
+    BasicVertex2d::new([0.0,   0.5], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]),
+    BasicVertex2d::new([-0.5, -0.5], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]),
+    BasicVertex2d::new([0.5,  -0.5], [1.0, 1.0],[0.0, 0.0, 1.0, 1.0]),
 ];
 
 impl AppCore for SandboxApp {
@@ -33,7 +33,7 @@ impl AppCore for SandboxApp {
             RenderPipelineBuilder::new()
                 .with_layout(&pipeline_layout)
                 .with_shader_source(include_str!("assets/triangle.wgsl"))
-                .push_vertex_buffer_layout::<BasicVertex3d>()
+                .push_vertex_buffer_layout::<BasicVertex2d>()
                 .push_color_target(wgpu::ColorTargetState {
                     blend: Some(wgpu::BlendState::REPLACE),
                     format: surface_config.format,
