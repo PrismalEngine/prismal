@@ -1,5 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
 use crate::component::linear_acceleration::CptLinearAcceleration;
 use crate::component::linear_velocity::CptLinearVelocity;
 use crate::resource::time::Time;
@@ -24,7 +22,10 @@ impl<'a> System<'a> for SysLinearAcceleration {
     fn run(&mut self, mut data: Self::SystemData) {
         let frame_delta = data.time.frame_delta().as_secs_f32();
         for (vel, accel) in (&mut data.velocities, &data.accelerations).join() {
-            *vel.deref_mut() += (*accel.deref()) * frame_delta;
+            if !vel.enabled || !accel.enabled {
+                continue;
+            }
+            **vel += **accel * frame_delta;
         }
     }
 }
