@@ -3,6 +3,8 @@ use specs::World;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum EcsInitializeOrder {
+    #[doc(hidden)]
+    InternalUseOnlyAssetsEcsInitializer,
     User(i16),
     #[doc(hidden)]
     InternalUseOnlyDefaultEcsInitializer,
@@ -11,13 +13,28 @@ pub enum EcsInitializeOrder {
 impl PartialOrd for EcsInitializeOrder {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match self {
+            EcsInitializeOrder::InternalUseOnlyAssetsEcsInitializer => match other {
+                EcsInitializeOrder::InternalUseOnlyAssetsEcsInitializer => {
+                    Some(std::cmp::Ordering::Equal)
+                }
+                EcsInitializeOrder::User(_) => Some(std::cmp::Ordering::Less),
+                EcsInitializeOrder::InternalUseOnlyDefaultEcsInitializer => {
+                    Some(std::cmp::Ordering::Less)
+                }
+            },
             EcsInitializeOrder::User(rhs) => match other {
+                EcsInitializeOrder::InternalUseOnlyAssetsEcsInitializer => {
+                    Some(std::cmp::Ordering::Greater)
+                }
                 EcsInitializeOrder::User(lhs) => rhs.partial_cmp(lhs),
                 EcsInitializeOrder::InternalUseOnlyDefaultEcsInitializer => {
                     Some(std::cmp::Ordering::Less)
                 }
             },
             EcsInitializeOrder::InternalUseOnlyDefaultEcsInitializer => match other {
+                EcsInitializeOrder::InternalUseOnlyAssetsEcsInitializer => {
+                    Some(std::cmp::Ordering::Less)
+                }
                 EcsInitializeOrder::User(_) => Some(std::cmp::Ordering::Greater),
                 EcsInitializeOrder::InternalUseOnlyDefaultEcsInitializer => {
                     Some(std::cmp::Ordering::Equal)

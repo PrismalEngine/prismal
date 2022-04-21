@@ -26,14 +26,14 @@ pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
         app.resources_mut().insert(gfx);
     }
 
+    let mut world = create_world::<A>();
+    let mut tick_dispatcher = create_tick_dispatcher::<A>();
+    tick_dispatcher.setup(&mut world);
+
     {
         let mut app = app.borrow_int_mut().unwrap();
         app.start();
     }
-
-    let mut world = create_world::<A>();
-    let mut tick_dispatcher = create_tick_dispatcher::<A>();
-    tick_dispatcher.setup(&mut world);
 
     event_loop.run(move |event, _, flow| {
         handle_event(app.clone(), &mut tick_dispatcher, &mut world, event, flow);
