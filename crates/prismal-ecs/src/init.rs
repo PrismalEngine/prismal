@@ -46,6 +46,7 @@ fn default_initializers() -> Vec<Box<dyn EcsInitializer>> {
     vec![Box::new(DefaultEcsInitializer) as Box<dyn EcsInitializer>]
 }
 
+#[doc(hidden)]
 pub fn create_tick_dispatcher<'a, 'b>(
     pre_initializers: &[Box<dyn EcsInitializer>],
     post_initializers: &[Box<dyn EcsInitializer>],
@@ -62,6 +63,7 @@ pub fn create_tick_dispatcher<'a, 'b>(
     builder.build()
 }
 
+#[doc(hidden)]
 pub fn create_world(
     pre_initializers: &[Box<dyn EcsInitializer>],
     post_initializers: &[Box<dyn EcsInitializer>],
