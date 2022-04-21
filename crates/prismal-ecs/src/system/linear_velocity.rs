@@ -4,6 +4,7 @@ use crate::resource::time::Time;
 
 use prismal_ecs_core::prelude::*;
 
+/// System for moving [`CptPosition`] every frame by [`CptLinearVelocity`]
 pub struct SysLinearVelocity;
 
 impl SysLinearVelocity {

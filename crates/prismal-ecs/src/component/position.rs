@@ -10,7 +10,10 @@ use prismal_math::vector::*;
 #[storage(VecStorage)]
 #[educe(Deref, DerefMut)]
 #[serde(transparent)]
-pub struct CptPosition(pub Vec3);
+pub struct CptPosition(
+    /// Position value in meters
+    pub Vec3,
+);
 
 impl CptPosition {
     /// [`CptPosition`] with the coordinates, `(0, 0, 0)`

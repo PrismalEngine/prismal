@@ -10,7 +10,10 @@ use prismal_math::quat::*;
 #[storage(VecStorage)]
 #[educe(Deref, DerefMut)]
 #[serde(transparent)]
-pub struct CptRotation(pub Quat);
+pub struct CptRotation(
+    /// Rotation value
+    pub Quat,
+);
 
 impl CptRotation {
     /// [`CptRotation`] corresponding to no rotation

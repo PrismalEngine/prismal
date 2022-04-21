@@ -4,14 +4,15 @@ use crate::resource::time::Time;
 
 use prismal_ecs_core::prelude::*;
 
+/// System for accelerating [`CptLinearVelocity`] every frame by [`CptLinearAcceleration`]
+pub struct SysLinearAcceleration;
+
 #[derive(SystemData)]
 pub struct SysLinearAccelerationData<'a> {
     time: Read<'a, Time>,
     velocities: WriteStorage<'a, CptLinearVelocity>,
     accelerations: ReadStorage<'a, CptLinearAcceleration>,
 }
-
-pub struct SysLinearAcceleration;
 
 impl SysLinearAcceleration {
     pub const NAME: &'static str = "prismal_sys_linear_acceleration";

@@ -22,6 +22,7 @@ cfg_if::cfg_if! {
     }
 }
 
+/// Resource for keeping track of time values
 pub struct Time {
     frame_delta: Duration,
     app_start_time: TimePoint,
@@ -29,7 +30,7 @@ pub struct Time {
 }
 
 impl Time {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let n = now();
         Self {
             frame_delta: Duration::from_millis(20),
@@ -37,10 +38,32 @@ impl Time {
             app_start_time: n,
         }
     }
+
+    /// Return the number of seconds since the app started running.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use prismal_ecs::resource::time::Time;
+    ///
+    /// let time = Time::default();
+    /// let seconds: std::time::Duration = time.seconds();
+    /// ```
     pub fn seconds(&self) -> Duration {
         let n = now();
         n - self.app_start_time
     }
+
+    /// Return the number of seconds the last frame took to complete.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use prismal_ecs::resource::time::Time;
+    ///
+    /// let time = Time::default(); // In a real app, get through ECS!
+    /// let frame_delta: std::time::Duration = time.frame_delta();
+    /// ```
     pub fn frame_delta(&self) -> Duration {
         self.frame_delta
     }

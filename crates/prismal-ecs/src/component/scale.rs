@@ -10,7 +10,10 @@ use prismal_math::vector::*;
 #[storage(VecStorage)]
 #[educe(Deref, DerefMut)]
 #[serde(transparent)]
-pub struct CptScale(pub Vec3);
+pub struct CptScale(
+    /// Scale value
+    pub Vec3,
+);
 
 impl CptScale {
     /// [`CptScale`] with the components, `(1, 1, 1)`
