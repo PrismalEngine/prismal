@@ -1,11 +1,14 @@
 use educe::Educe;
+use serde::{Deserialize, Serialize};
 
 use prismal_ecs_core::prelude::*;
 use prismal_math::vector::*;
 
 /// 3D linear acceleration ECS component
 #[derive(Debug, Component, Educe)]
+#[derive(Deserialize, Serialize)]
 #[educe(Deref, DerefMut)]
+#[serde(rename_all = "kebab-case")]
 pub struct CptLinearAcceleration {
     pub enabled: bool,
 

@@ -1,12 +1,15 @@
 use educe::Educe;
+use serde::{Deserialize, Serialize};
 
 use prismal_ecs_core::prelude::*;
 use prismal_math::vector::*;
 
 /// 3D scale ECS component
 #[derive(Debug, Component, Educe)]
+#[derive(Deserialize, Serialize)]
 #[storage(VecStorage)]
 #[educe(Deref, DerefMut)]
+#[serde(transparent)]
 pub struct CptScale(pub Vec3);
 
 impl CptScale {
