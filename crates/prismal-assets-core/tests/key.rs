@@ -14,17 +14,17 @@ fn test_asset_key_serde() {
 #[test]
 #[wasm_bindgen_test]
 fn test_asset_key_factory_case() {
-    let a = asset_key("a/b/c");
-    let b = asset_key("a/B/c");
+    let a = "a/b/c".asset_key();
+    let b = "a/B/c".asset_key();
     assert_eq!(a, b);
 }
 
 #[test]
 #[wasm_bindgen_test]
 fn test_asset_key_factory_separator() {
-    let a = asset_key("a\\b/c");
-    let b = asset_key("a/b\\c");
-    let c = asset_key("a/b/c");
+    let a = "a\\b/c".asset_key();
+    let b = "a/b\\c".asset_key();
+    let c = "a/b/c".asset_key();
     assert_eq!(a, b);
     assert_eq!(b, c);
     assert_eq!(a, c);
@@ -33,9 +33,9 @@ fn test_asset_key_factory_separator() {
 #[test]
 #[wasm_bindgen_test]
 fn test_asset_key_factory_trim() {
-    let a = asset_key("a/b/c ");
-    let b = asset_key("  a/b/c");
-    let c = asset_key("a/b/c");
+    let a = "a/b/c ".asset_key();
+    let b = "  a/b/c".asset_key();
+    let c = "a/b/c".asset_key();
     assert_eq!(a, b);
     assert_eq!(b, c);
     assert_eq!(a, c);
