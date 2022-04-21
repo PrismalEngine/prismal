@@ -1,10 +1,13 @@
-use super::Vertex;
 use bytemuck::{Pod, Zeroable};
+use educe::Educe;
+use serde::{Deserialize, Serialize};
+
 use prismal_math::vector::{Vec2, Vec4};
 
-use educe::Educe;
+use super::Vertex;
 
 #[derive(Debug, Copy, Clone, Pod, Zeroable)]
+#[derive(Serialize, Deserialize)]
 #[derive(Educe)]
 #[educe(Default)]
 #[repr(C)]

@@ -1,12 +1,19 @@
-use super::Vertex;
 use bytemuck::{Pod, Zeroable};
+use educe::Educe;
+use serde::{Deserialize, Serialize};
+
 use prismal_math::vector::{Vec2, Vec3, Vec4};
 
-use educe::Educe;
+use super::Vertex;
+
+type FlatType = [f32; 15];
 
 #[derive(Debug, Copy, Clone, Pod, Zeroable)]
+#[derive(Serialize, Deserialize)]
 #[derive(Educe)]
 #[educe(Default)]
+#[serde(from = "FlatType")]
+#[serde(into = "FlatType")]
 #[repr(C)]
 pub struct BasicVertex3d {
     #[educe(Default(expression = "[0.0; 3]"))]
@@ -23,6 +30,31 @@ pub struct BasicVertex3d {
 
     #[educe(Default(expression = "[0.0, 0.0, 0.0, 1.0]"))]
     pub color: [f32; 4],
+}
+
+impl From<FlatType> for BasicVertex3d {
+    fn from(arr: FlatType) -> Self {
+        Self {
+            position: [arr[0], arr[1], arr[2]],
+            normal: [arr[3], arr[4], arr[5]],
+            tangent: [arr[6], arr[7], arr[8]],
+            tex_coords: [arr[9], arr[10]],
+            color: [arr[11], arr[12], arr[13], arr[14]],
+        }
+    }
+}
+
+impl From<BasicVertex3d> for FlatType {
+    #[rustfmt::skip]
+    fn from(arr: BasicVertex3d) -> Self {
+        [
+            arr.position[0], arr.position[1], arr.position[2],
+            arr.normal[0], arr.normal[1], arr.normal[2],
+            arr.tangent[0], arr.tangent[1], arr.tangent[2],
+            arr.tex_coords[0], arr.tex_coords[1], 
+            arr.color[0], arr.color[1], arr.color[2], arr.color[3],
+        ]
+    }
 }
 
 impl BasicVertex3d {

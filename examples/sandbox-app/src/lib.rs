@@ -12,9 +12,16 @@ struct SandboxApp {
 
 #[rustfmt::skip]
 const VERTICES: &[BasicVertex2d] = &[
-    BasicVertex2d::new([0.0,   0.5], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]),
-    BasicVertex2d::new([-0.5, -0.5], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]),
-    BasicVertex2d::new([0.5,  -0.5], [1.0, 1.0],[0.0, 0.0, 1.0, 1.0]),
+    BasicVertex2d::new([-0.5,  0.5], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]), // TL
+    BasicVertex2d::new([-0.5, -0.5], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]), // BL
+    BasicVertex2d::new([ 0.5, -0.5], [1.0, 1.0],[0.0, 0.0, 1.0, 1.0]), // BR
+    BasicVertex2d::new([ 0.5,  0.5], [1.0, 1.0],[1.0, 1.0, 1.0, 1.0]), // TR
+];
+
+#[rustfmt::skip]
+const INDICES: &[u16] = &[
+    0, 1, 3,
+    3, 1, 2,
 ];
 
 impl AppCore for SandboxApp {
@@ -48,6 +55,11 @@ impl AppCore for SandboxApp {
             bytemuck::cast_slice(VERTICES),
             wgpu::BufferUsages::VERTEX,
         ));
+        let index_buffer = Rc::new(SimpleBuffer::from_bytes(
+            &gfx_state.device,
+            bytemuck::cast_slice(INDICES),
+            wgpu::BufferUsages::INDEX,
+        ));
         gfx_state.set_render_callback(move |rp| {
             let pipeline = pipeline.clone();
             let pipeline = Rc::as_ptr(&pipeline);
@@ -55,9 +67,16 @@ impl AppCore for SandboxApp {
             let vertex_buffer = vertex_buffer.clone();
             let vertex_buffer = Rc::as_ptr(&vertex_buffer);
 
+            let index_buffer = index_buffer.clone();
+            let index_buffer = Rc::as_ptr(&index_buffer);
+
             rp.set_pipeline(unsafe { &*pipeline });
             rp.set_vertex_buffer(0, unsafe { (*vertex_buffer).buffer.slice(..) });
-            rp.draw(0..(VERTICES.len() as u32), 0..1);
+            rp.set_index_buffer(
+                unsafe { (*index_buffer).buffer.slice(..) },
+                wgpu::IndexFormat::Uint16,
+            );
+            rp.draw_indexed(0..(INDICES.len() as u32), 0, 0..1);
         });
     }
 
