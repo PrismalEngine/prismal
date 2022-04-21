@@ -21,9 +21,20 @@ fn test_asset_key_factory_case() {
 
 #[test]
 #[wasm_bindgen_test]
-fn test_asset_key_factory_separator() {
+fn test_asset_key_factory_separator_char() {
     let a = "a\\b/c".asset_key();
     let b = "a/b\\c".asset_key();
+    let c = "a/b/c".asset_key();
+    assert_eq!(a, b);
+    assert_eq!(b, c);
+    assert_eq!(a, c);
+}
+
+#[test]
+#[wasm_bindgen_test]
+fn test_asset_key_factory_separator_repeat() {
+    let a = "a\\\\b/c".asset_key();
+    let b = "a//b\\c".asset_key();
     let c = "a/b/c".asset_key();
     assert_eq!(a, b);
     assert_eq!(b, c);
