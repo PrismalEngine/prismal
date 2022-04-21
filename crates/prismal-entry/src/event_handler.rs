@@ -6,6 +6,7 @@ use prismal_window::prelude::*;
 
 use prismal_ecs::prelude::*;
 
+/// Handle a `winit` event
 pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     app: UnsyncRcMut<A>,
     tick_dispatcher: &mut Dispatcher<'a, 'b>,

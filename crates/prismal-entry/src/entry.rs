@@ -7,6 +7,7 @@ use prismal_window::prelude::*;
 use crate::ecs::*;
 use crate::event_handler::handle_event;
 
+/// Prismal Engine entry point
 pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
     initialize_platform();
     let app = A::make_app();
