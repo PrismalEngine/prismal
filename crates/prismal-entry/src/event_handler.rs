@@ -4,8 +4,12 @@ use prismal_utils::interior_mut::InteriorMut;
 use prismal_utils::shared::UnsyncRcMut;
 use prismal_window::prelude::*;
 
-pub fn handle_event<A: AppCore + 'static>(
+use prismal_ecs::prelude::*;
+
+pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     app: UnsyncRcMut<A>,
+    tick_dispatcher: &mut Dispatcher<'a, 'b>,
+    world: &mut World,
     event: WinitEvent<()>,
     flow: &mut ControlFlow,
 ) {
@@ -63,6 +67,7 @@ pub fn handle_event<A: AppCore + 'static>(
                     }
                 }
             }
+            tick_dispatcher.dispatch(world);
         }
         _ => {}
     }

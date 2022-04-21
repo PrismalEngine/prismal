@@ -1,3 +1,6 @@
+mod sandbox_ecs;
+use sandbox_ecs::SysPrintFps;
+
 use prismal::prelude::*;
 
 #[cfg(target_arch = "wasm32")]
@@ -64,6 +67,24 @@ impl AppFactory for SandboxApp {
             resources: AppResources::new(),
             pipeline: None,
         })
+    }
+}
+
+impl AppEcs for SandboxApp {
+    fn ecs_initializers() -> Vec<Box<dyn EcsInitializer>> {
+        struct SandboxEcsInitiallizer;
+        impl EcsInitializer for SandboxEcsInitiallizer {
+            fn setup_tick_dispatcher<'a, 'b>(
+                &self,
+                builder: DispatcherBuilder<'a, 'b>,
+            ) -> DispatcherBuilder<'a, 'b> {
+                builder.with(SysPrintFps, "app_sys_print_fps", &[])
+            }
+
+            fn setup_world(&self, _world: &mut World) {}
+        }
+
+        vec![Box::new(SandboxEcsInitiallizer)]
     }
 }
 

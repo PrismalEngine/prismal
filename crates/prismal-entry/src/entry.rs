@@ -1,12 +1,13 @@
-use prismal_app_core::traits::{AppCore, AppFactory};
+use prismal_app_core::traits::{AppCore, AppEcs, AppFactory};
 use prismal_gfx::state::GfxState;
 use prismal_platform_init::init::initialize_platform;
 use prismal_utils::interior_mut::InteriorMut;
 use prismal_window::prelude::*;
 
+use crate::ecs::*;
 use crate::event_handler::handle_event;
 
-pub async fn entry<A: AppCore + AppFactory + 'static>() {
+pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
     initialize_platform();
     let app = A::make_app();
 
@@ -29,7 +30,11 @@ pub async fn entry<A: AppCore + AppFactory + 'static>() {
         app.start();
     }
 
+    let mut world = create_world::<A>();
+    let mut tick_dispatcher = create_tick_dispatcher::<A>();
+    tick_dispatcher.setup(&mut world);
+
     event_loop.run(move |event, _, flow| {
-        handle_event(app.clone(), event, flow);
+        handle_event(app.clone(), &mut tick_dispatcher, &mut world, event, flow);
     });
 }

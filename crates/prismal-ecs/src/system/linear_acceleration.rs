@@ -13,6 +13,10 @@ pub struct SysLinearAccelerationData<'a> {
 
 pub struct SysLinearAcceleration;
 
+impl SysLinearAcceleration {
+    pub const NAME: &'static str = "prismal_sys_linear_acceleration";
+}
+
 impl<'a> System<'a> for SysLinearAcceleration {
     type SystemData = SysLinearAccelerationData<'a>;
     fn run(&mut self, mut data: Self::SystemData) {
