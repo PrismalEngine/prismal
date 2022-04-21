@@ -4,7 +4,7 @@ use crate::resource::time::Time;
 
 #[derive(SystemData)]
 pub struct SysUpdateTimeData<'a> {
-    time: WriteExpect<'a, Time>,
+    time: Write<'a, Time>,
 }
 
 pub struct SysUpdateTime;
