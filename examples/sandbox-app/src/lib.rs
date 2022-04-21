@@ -36,10 +36,12 @@ impl AppCore for SandboxApp {
                     push_constant_ranges: &[],
                 });
         let surface_config = gfx_state.surface_config.borrow_int_mut().unwrap().clone();
+        let shader_source =
+            String::from_utf8(read_asset_file_bytes("assets/triangle.wgsl").unwrap()).unwrap();
         let pipeline = Rc::new(
             RenderPipelineBuilder::new()
                 .with_layout(&pipeline_layout)
-                .with_shader_source(include_str!("assets/triangle.wgsl"))
+                .with_shader_source(&shader_source)
                 .push_vertex_buffer_layout::<BasicVertex2d>()
                 .push_color_target(wgpu::ColorTargetState {
                     blend: Some(wgpu::BlendState::REPLACE),
