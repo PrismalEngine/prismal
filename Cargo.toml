@@ -13,7 +13,6 @@ prismal-gfx = { version = "0.1.0", path = "crates/prismal-gfx" }
 prismal-math = { version = "0.1.0", path = "crates/prismal-math" }
 prismal-utils = { version = "0.1.0", path = "crates/prismal-utils" }
 
-
 [workspace]
 members = [
     "crates/*",
