@@ -17,7 +17,6 @@ pub struct CptLinearAcceleration {
 }
 
 impl CptLinearAcceleration {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enabled: true,
@@ -29,5 +28,11 @@ impl CptLinearAcceleration {
             enabled: false,
             meters_per_second_sq: Vec3::ZERO,
         }
+    }
+}
+
+impl Default for CptLinearAcceleration {
+    fn default() -> Self {
+        Self::new()
     }
 }
