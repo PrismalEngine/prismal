@@ -1,5 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone, Copy)]
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize)]
+#[serde(from = "u16", into = "u16")]
 pub enum AssetTypeId {
     Group,
     Scene,

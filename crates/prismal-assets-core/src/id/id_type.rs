@@ -1,7 +1,11 @@
 use std::hash::Hash;
 
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Copy, Clone)]
 #[derive(Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize)]
+#[serde(transparent)]
 #[repr(transparent)]
 pub struct AssetId(pub(crate) u64);
 
