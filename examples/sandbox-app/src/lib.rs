@@ -8,8 +8,14 @@ use wasm_bindgen::prelude::*;
 
 struct SandboxApp {
     resources: Box<AppResources>,
-    pipeline: Option<Rc<wgpu::RenderPipeline>>,
 }
+
+#[rustfmt::skip]
+const VERTICES: &[BasicVertex3d] = &[
+    BasicVertex3d::new([0.0,   0.5, 0.0], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]),
+    BasicVertex3d::new([-0.5, -0.5, 0.0], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]),
+    BasicVertex3d::new([0.5,  -0.5, 0.0], [1.0, 1.0],[0.0, 0.0, 1.0, 1.0]),
+];
 
 impl AppCore for SandboxApp {
     fn start(&mut self) {
@@ -27,6 +33,7 @@ impl AppCore for SandboxApp {
             RenderPipelineBuilder::new()
                 .with_layout(&pipeline_layout)
                 .with_shader_source(include_str!("assets/triangle.wgsl"))
+                .push_vertex_buffer_layout::<BasicVertex3d>()
                 .push_color_target(wgpu::ColorTargetState {
                     blend: Some(wgpu::BlendState::REPLACE),
                     format: surface_config.format,
@@ -35,12 +42,22 @@ impl AppCore for SandboxApp {
                 .build(&gfx_state.device)
                 .unwrap(),
         );
-        self.pipeline = Some(pipeline.clone());
+
+        let vertex_buffer = Rc::new(SimpleBuffer::from_bytes(
+            &gfx_state.device,
+            bytemuck::cast_slice(VERTICES),
+            wgpu::BufferUsages::VERTEX,
+        ));
         gfx_state.set_render_callback(move |rp| {
             let pipeline = pipeline.clone();
             let pipeline = Rc::as_ptr(&pipeline);
+
+            let vertex_buffer = vertex_buffer.clone();
+            let vertex_buffer = Rc::as_ptr(&vertex_buffer);
+
             rp.set_pipeline(unsafe { &*pipeline });
-            rp.draw(0..6, 0..1);
+            rp.set_vertex_buffer(0, unsafe { (*vertex_buffer).buffer.slice(..) });
+            rp.draw(0..(VERTICES.len() as u32), 0..1);
         });
     }
 
@@ -65,15 +82,14 @@ impl AppFactory for SandboxApp {
     fn make_app() -> UnsyncRcMut<Self> {
         unsync_rc_mut(Self {
             resources: AppResources::new(),
-            pipeline: None,
         })
     }
 }
 
 impl AppEcs for SandboxApp {
     fn ecs_initializers() -> Vec<Box<dyn EcsInitializer>> {
-        struct SandboxEcsInitiallizer;
-        impl EcsInitializer for SandboxEcsInitiallizer {
+        struct SandboxEcsInitializer;
+        impl EcsInitializer for SandboxEcsInitializer {
             fn setup_tick_dispatcher<'a, 'b>(
                 &self,
                 builder: DispatcherBuilder<'a, 'b>,
@@ -84,7 +100,7 @@ impl AppEcs for SandboxApp {
             fn setup_world(&self, _world: &mut World) {}
         }
 
-        vec![Box::new(SandboxEcsInitiallizer)]
+        vec![Box::new(SandboxEcsInitializer)]
     }
 }
 

@@ -2,6 +2,8 @@ use std::borrow::Cow;
 
 use thiserror::Error;
 
+use crate::vertex::Vertex;
+
 #[derive(Debug, Error)]
 pub enum PipelineBuilderError {
     #[error("PipelineBuilder is missing required field: `{0}`")]
@@ -75,11 +77,8 @@ impl<'a> RenderPipelineBuilder<'a> {
             ..self
         }
     }
-    pub fn push_vertex_buffer_layout(
-        mut self,
-        buffer_layout: wgpu::VertexBufferLayout<'a>,
-    ) -> Self {
-        self.vertex_buffers.push(buffer_layout);
+    pub fn push_vertex_buffer_layout<V: Vertex>(mut self) -> Self {
+        self.vertex_buffers.push(V::vertex_desc());
         self
     }
 

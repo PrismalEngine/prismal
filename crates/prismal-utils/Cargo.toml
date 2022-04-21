@@ -11,3 +11,4 @@ pollster = "0.2"
 cfg-if = "1"
 
 parking_lot = { version = "0.12", features = ["nightly"] }
+bytemuck = {version = "1.9", features = ["derive"]}

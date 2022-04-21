@@ -8,11 +8,15 @@ edition = "2021"
 [dependencies]
 prismal-app-core = { version = "0.1.0", path = "../prismal-app-core" }
 prismal-utils = { version = "0.1.0", path = "../prismal-utils" }
+prismal-math = { version = "0.1.0", path = "../prismal-math" }
 prismal-window = { version = "0.1.0", path = "../prismal-window" }
 
 cfg-if = "1"
 wgpu = { version = "0.12", git = "https://github.com/gfx-rs/wgpu.git" }
 thiserror = "1.0"
+educe = "0.4"
+
+bytemuck = {version = "1.9", features = ["derive"]}
 
 [target.'cfg(target_arch="wasm32")'.dependencies]
 wgpu = { version = "0.12", git="https://github.com/gfx-rs/wgpu.git", features = ["webgl"] }
