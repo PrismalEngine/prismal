@@ -6,6 +6,13 @@ wasm_bindgen_test_configure!(run_in_browser);
 
 #[test]
 #[wasm_bindgen_test]
+fn test_asset_id_serde() {
+    use serde_test::{assert_tokens, Token};
+    assert_tokens(&AssetId::from(42), &[Token::U64(42)]);
+}
+
+#[test]
+#[wasm_bindgen_test]
 fn test_asset_id_factory_case() {
     let a = asset_id("a/b/c");
     let b = asset_id("a/B/c");

@@ -7,7 +7,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct AssetId(pub(crate) u64);
+pub struct AssetId(u64);
+
+impl From<u64> for AssetId {
+    fn from(i: u64) -> Self {
+        Self(i)
+    }
+}
 
 impl PartialEq for AssetId {
     fn eq(&self, other: &Self) -> bool {
