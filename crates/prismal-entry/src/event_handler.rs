@@ -10,12 +10,9 @@ use prismal_ecs::prelude::*;
 pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     app: UnsyncRcMut<A>,
     tick_dispatcher: &mut Dispatcher<'a, 'b>,
-    world: &mut World,
     event: WinitEvent<()>,
     flow: &mut ControlFlow,
 ) {
-    let app = app.borrow_int_mut().unwrap();
-
     fn resize_gfx<A: AppCore + 'static>(
         app: impl std::ops::Deref<Target = A>,
         width: u32,
@@ -46,29 +43,39 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
                 *flow = ControlFlow::Exit;
             }
             WinitWindowEvent::Resized(new_inner_size) => {
-                resize_window(app, new_inner_size);
+                let app_ref = app.borrow_int_mut().unwrap();
+                resize_window(app_ref, new_inner_size);
             }
             WinitWindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                resize_window(app, *new_inner_size);
+                let app_ref = app.borrow_int_mut().unwrap();
+                resize_window(app_ref, *new_inner_size);
             }
             _ => {}
         },
         WinitEvent::MainEventsCleared => {
-            let gfx = app.resources().get::<GfxState>().unwrap();
-            if let Err(err) = gfx.render() {
-                match err {
-                    SurfaceError::Outdated | SurfaceError::Lost => resize_gfx_current(app),
-                    SurfaceError::OutOfMemory => {
-                        log::error!("GPU out of memory!");
-                        panic!("{:?}", err);
-                    }
-                    _ => {
-                        log::error!("Surface Error: {:?}", err);
-                        panic!("{:?}", err);
+            {
+                let app_ref = app.borrow_int_mut().unwrap();
+                let gfx = app_ref.resources().get::<GfxState>().unwrap();
+                if let Err(err) = gfx.render() {
+                    match err {
+                        SurfaceError::Outdated | SurfaceError::Lost => resize_gfx_current(app_ref),
+                        SurfaceError::OutOfMemory => {
+                            log::error!("GPU out of memory!");
+                            panic!("{:?}", err);
+                        }
+                        _ => {
+                            log::error!("Surface Error: {:?}", err);
+                            panic!("{:?}", err);
+                        }
                     }
                 }
             }
-            tick_dispatcher.dispatch(world);
+
+            {
+                let app_ref = app.borrow_int_mut().unwrap();
+                let world = app_ref.resources().get::<World>().unwrap();
+                tick_dispatcher.dispatch(world);
+            }
         }
         _ => {}
     }

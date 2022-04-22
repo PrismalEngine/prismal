@@ -11,7 +11,7 @@ prismal-utils = { version = "0.1.0", path = "../prismal-utils" }
 winit = "0.26"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-web-sys = { version = "0.3.53", features = [
+web-sys = { version = "0.3", features = [
     "Document",
     "Window",
     "Element",

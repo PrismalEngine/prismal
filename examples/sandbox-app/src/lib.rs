@@ -26,6 +26,16 @@ const INDICES: &[u16] = &[
 
 impl AppCore for SandboxApp {
     fn start(&mut self) {
+        let world = self.resources.get::<World>().unwrap();
+        let assets = world.fetch::<Assets>();
+        let shader_bytes = assets
+            .get_loaded::<LoadedBytesAsset>("assets/triangle.wgsl".asset_key())
+            .unwrap();
+        let shader_source = String::from_utf8(shader_bytes.bytes.clone()).unwrap();
+
+        drop(shader_bytes);
+        drop(assets);
+
         let gfx_state = self.resources.get_mut::<GfxState>().unwrap();
         let pipeline_layout =
             gfx_state
@@ -36,8 +46,7 @@ impl AppCore for SandboxApp {
                     push_constant_ranges: &[],
                 });
         let surface_config = gfx_state.surface_config.borrow_int_mut().unwrap().clone();
-        let shader_source =
-            String::from_utf8(read_asset_file_bytes("assets/triangle.wgsl").unwrap()).unwrap();
+
         let pipeline = Rc::new(
             RenderPipelineBuilder::new()
                 .with_layout(&pipeline_layout)
@@ -96,6 +105,10 @@ impl AppCore for SandboxApp {
 
     fn resources_mut(&mut self) -> &mut AppResources {
         self.resources.as_mut()
+    }
+
+    fn preload_asset_paths(&self) -> Vec<String> {
+        vec![String::from("assets/triangle.wgsl")]
     }
 }
 
