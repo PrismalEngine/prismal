@@ -1,5 +1,5 @@
 mod sandbox_ecs;
-use sandbox_ecs::SysPrintFps;
+// use sandbox_ecs::SysPrintFps;
 
 use prismal::prelude::*;
 
@@ -128,7 +128,8 @@ impl AppEcs for SandboxApp {
                 &self,
                 builder: DispatcherBuilder<'a, 'b>,
             ) -> DispatcherBuilder<'a, 'b> {
-                builder.with(SysPrintFps, "app_sys_print_fps", &[])
+                // builder.with(SysPrintFps, "app_sys_print_fps", &[])
+                builder
             }
 
             fn setup_world(&self, _world: &mut World) {}

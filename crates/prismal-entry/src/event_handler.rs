@@ -1,10 +1,17 @@
 use prismal_app_core::traits::AppCore;
+
 use prismal_gfx::prelude::*;
 use prismal_utils::interior_mut::InteriorMut;
 use prismal_utils::shared::UnsyncRcMut;
 use prismal_window::prelude::*;
 
+use winit::event::ElementState;
+use winit::event::MouseButton;
+
 use prismal_ecs::prelude::*;
+
+use prismal_events::event::base_event::Event;
+use prismal_events::manager::EventManager;
 
 /// Handle a `winit` event
 pub fn handle_event<'a, 'b, A: AppCore + 'static>(
@@ -37,18 +44,38 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
         resize_gfx(app, new_inner_size.width, new_inner_size.height);
     }
 
-    match event {
+    {
+        let event = Event::try_from_winit(&event);
+        if let Ok(event) = event {
+            let app_ref = app.borrow_int_mut().unwrap();
+            let world = app_ref.resources().get::<World>().unwrap();
+            let mut event_manager = world.fetch_mut::<EventManager>();
+            event_manager.push(event);
+        }
+    }
+    match &event {
         WinitEvent::WindowEvent { event, .. } => match event {
             WinitWindowEvent::CloseRequested => {
                 *flow = ControlFlow::Exit;
             }
             WinitWindowEvent::Resized(new_inner_size) => {
                 let app_ref = app.borrow_int_mut().unwrap();
-                resize_window(app_ref, new_inner_size);
+                resize_window(app_ref, *new_inner_size);
+            }
+            WinitWindowEvent::MouseInput {
+                state: ElementState::Pressed,
+                button: MouseButton::Left,
+                ..
+            } => {
+                let app_ref = app.borrow_int_mut().unwrap();
+                let window = app_ref.resources().get_unsync::<Window>().unwrap();
+                if let Err(err) = window.set_cursor_grab(true) {
+                    log::error!("{:?}", err);
+                }
             }
             WinitWindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                 let app_ref = app.borrow_int_mut().unwrap();
-                resize_window(app_ref, *new_inner_size);
+                resize_window(app_ref, **new_inner_size);
             }
             _ => {}
         },

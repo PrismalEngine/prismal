@@ -3,9 +3,10 @@ use prismal_ecs::prelude::*;
 
 fn collect_initializers<A: AppEcs>() -> Vec<Box<dyn EcsInitializer>> {
     let mut initializers = A::ecs_initializers();
-    initializers.append(&mut vec![Box::new(
-        prismal_assets::init::AssetsEcsInitializer,
-    )]);
+    initializers.append(&mut vec![
+        Box::new(prismal_assets::init::AssetsEcsInitializer),
+        Box::new(prismal_events::init::EventsEcsInitializer),
+    ]);
     initializers
 }
 
