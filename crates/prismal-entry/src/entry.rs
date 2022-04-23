@@ -5,6 +5,8 @@ use prismal_platform_init::init::initialize_platform;
 use prismal_utils::interior_mut::InteriorMut;
 use prismal_window::prelude::*;
 
+use prismal_ecs::prelude::*;
+
 use crate::ecs::*;
 use crate::event_handler::handle_event;
 
@@ -29,23 +31,21 @@ pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
     }
 
     let mut world = create_world::<A>();
-
     let mut tick_dispatcher = create_tick_dispatcher::<A>();
     tick_dispatcher.setup(&mut world);
 
     let mut early_tick_dispatcher = create_early_tick_dispatcher::<A>();
     early_tick_dispatcher.setup(&mut world);
 
+    set_world(world);
+
     {
         let app = app.borrow_int_mut().unwrap();
+        let world = get_world();
         let mut assets = world.fetch_mut::<Assets>();
         for p in app.preload_asset_paths() {
             assets.load_bytes(p).await;
         }
-    }
-    {
-        let mut app = app.borrow_int_mut().unwrap();
-        app.resources_mut().insert(world);
     }
 
     {

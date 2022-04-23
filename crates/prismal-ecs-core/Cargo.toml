@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
+prismal-utils = { version = "0.1.0", path = "../prismal-utils" }
 
 [target.'cfg(not(target_arch="wasm32"))'.dependencies]
 specs = { version = "0.17", default-features=false, features = ["parallel", "specs-derive", "shred-derive"] }

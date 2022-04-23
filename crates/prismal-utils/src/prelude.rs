@@ -6,3 +6,4 @@ pub use crate::hash::fast::*;
 pub use crate::hash::int::*;
 
 pub use bytemuck;
+pub use once_cell;

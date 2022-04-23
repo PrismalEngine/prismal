@@ -48,8 +48,7 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     {
         let event = Event::try_from_winit(&event);
         if let Ok(event) = event {
-            let app_ref = app.borrow_int_mut().unwrap();
-            let world = app_ref.resources().get::<World>().unwrap();
+            let world = get_world();
             let mut event_manager = world.fetch_mut::<EventManager>();
             event_manager.push(event);
         }
@@ -100,8 +99,7 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
             }
 
             {
-                let app_ref = app.borrow_int_mut().unwrap();
-                let world = app_ref.resources().get::<World>().unwrap();
+                let world = get_world();
                 early_tick_dispatcher.dispatch(world);
                 tick_dispatcher.dispatch(world);
             }

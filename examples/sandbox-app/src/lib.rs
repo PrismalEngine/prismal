@@ -26,7 +26,7 @@ const INDICES: &[u16] = &[
 
 impl AppCore for SandboxApp {
     fn start(&mut self) {
-        let world = self.resources.get::<World>().unwrap();
+        let world = get_world();
         {
             let mut events = world.fetch_mut::<EventManager>();
             events.add_callback(EventCallback::new(|evt| {
