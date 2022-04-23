@@ -1,3 +1,4 @@
+pub mod compare;
 pub mod futures;
 pub mod hash;
 pub mod interior_mut;
