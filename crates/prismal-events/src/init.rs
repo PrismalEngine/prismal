@@ -10,7 +10,7 @@ impl EcsInitializer for EventsEcsInitializer {
     fn setup_world(&self, world: &mut World) {
         world.insert(EventManager::new());
     }
-    fn setup_tick_dispatcher<'a, 'b>(
+    fn setup_early_tick_dispatcher<'a, 'b>(
         &self,
         builder: DispatcherBuilder<'a, 'b>,
     ) -> DispatcherBuilder<'a, 'b> {
