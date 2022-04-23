@@ -64,8 +64,23 @@ pub trait EcsInitializer {
     fn setup_tick_dispatcher<'a, 'b>(
         &self,
         builder: DispatcherBuilder<'a, 'b>,
-    ) -> DispatcherBuilder<'a, 'b>;
+    ) -> DispatcherBuilder<'a, 'b> {
+        builder
+    }
+
+    /// Setup the *early* tick dispatcher using a [`DispatcherBuilder`].
+    /// Return the modified builder.
+    ///
+    /// Used to register systems that will run every frame, but
+    /// before the normal tick dispatcher.
+    fn setup_early_tick_dispatcher<'a, 'b>(
+        &self,
+        builder: DispatcherBuilder<'a, 'b>,
+    ) -> DispatcherBuilder<'a, 'b> {
+        builder
+    }
 
     /// Setup the ECS world (insert resources, register components, etc.)
-    fn setup_world(&self, world: &mut World);
+    #[allow(unused_variables)]
+    fn setup_world(&self, world: &mut World) {}
 }

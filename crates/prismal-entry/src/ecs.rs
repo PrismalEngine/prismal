@@ -16,6 +16,12 @@ pub fn create_tick_dispatcher<'a, 'b, A: AppEcs>() -> Dispatcher<'a, 'b> {
     prismal_ecs::init::create_tick_dispatcher(&initializers)
 }
 
+/// Return a new ECS dispatcher for ticking early every frame
+pub fn create_early_tick_dispatcher<'a, 'b, A: AppEcs>() -> Dispatcher<'a, 'b> {
+    let initializers = collect_initializers::<A>();
+    prismal_ecs::init::create_early_tick_dispatcher(&initializers)
+}
+
 /// Return a new ECS world
 pub fn create_world<A: AppEcs>() -> World {
     let initializers = collect_initializers::<A>();

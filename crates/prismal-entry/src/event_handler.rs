@@ -17,6 +17,7 @@ use prismal_events::manager::EventManager;
 pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     app: UnsyncRcMut<A>,
     tick_dispatcher: &mut Dispatcher<'a, 'b>,
+    early_tick_dispatcher: &mut Dispatcher<'a, 'b>,
     event: WinitEvent<()>,
     flow: &mut ControlFlow,
 ) {
@@ -101,6 +102,7 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
             {
                 let app_ref = app.borrow_int_mut().unwrap();
                 let world = app_ref.resources().get::<World>().unwrap();
+                early_tick_dispatcher.dispatch(world);
                 tick_dispatcher.dispatch(world);
             }
         }

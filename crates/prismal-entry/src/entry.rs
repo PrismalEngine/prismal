@@ -29,8 +29,12 @@ pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
     }
 
     let mut world = create_world::<A>();
+
     let mut tick_dispatcher = create_tick_dispatcher::<A>();
     tick_dispatcher.setup(&mut world);
+
+    let mut early_tick_dispatcher = create_early_tick_dispatcher::<A>();
+    early_tick_dispatcher.setup(&mut world);
 
     {
         let app = app.borrow_int_mut().unwrap();
@@ -50,6 +54,12 @@ pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
     }
 
     event_loop.run(move |event, _, flow| {
-        handle_event(app.clone(), &mut tick_dispatcher, event, flow);
+        handle_event(
+            app.clone(),
+            &mut tick_dispatcher,
+            &mut early_tick_dispatcher,
+            event,
+            flow,
+        );
     });
 }

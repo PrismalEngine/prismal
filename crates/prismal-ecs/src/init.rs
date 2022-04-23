@@ -72,6 +72,22 @@ pub fn create_tick_dispatcher<'a, 'b>(
 }
 
 #[doc(hidden)]
+pub fn create_early_tick_dispatcher<'a, 'b>(
+    initializers: &[Box<dyn EcsInitializer>],
+) -> Dispatcher<'a, 'b> {
+    let mut builder = DispatcherBuilder::new();
+    let default_initializers = default_initializers();
+    let initializers = initializers
+        .iter()
+        .chain(default_initializers.iter())
+        .sorted_by(|a, b| a.get_order().cmp(&b.get_order()));
+    for i in initializers {
+        builder = i.setup_early_tick_dispatcher(builder);
+    }
+    builder.build()
+}
+
+#[doc(hidden)]
 pub fn create_world(initializers: &[Box<dyn EcsInitializer>]) -> World {
     let mut world = World::new();
     let default_initializers = default_initializers();
