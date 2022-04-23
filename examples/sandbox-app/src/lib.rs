@@ -27,6 +27,13 @@ const INDICES: &[u16] = &[
 impl AppCore for SandboxApp {
     fn start(&mut self) {
         let world = self.resources.get::<World>().unwrap();
+        {
+            let mut events = world.fetch_mut::<EventManager>();
+            events.add_callback(EventCallback::new(|evt| {
+                log::info!("Event: {:?}", evt);
+            }));
+        }
+
         let assets = world.fetch::<Assets>();
         let shader_bytes = assets
             .get_loaded::<LoadedBytesAsset>("assets/triangle.wgsl".asset_key())

@@ -2,12 +2,13 @@ use std::collections::HashSet;
 
 use prismal_utils::hash::int::IntHasherBuilder;
 
+use crate::callback::EventCallback;
 use crate::event::base_event::Event;
-use crate::input::key_code::KeyCode;
 
 pub struct EventManager {
     pressed_keys: HashSet<u32, IntHasherBuilder>,
     queue: Vec<Event>,
+    callbacks: Vec<EventCallback>,
 }
 
 impl EventManager {
@@ -15,6 +16,7 @@ impl EventManager {
         Self {
             pressed_keys: HashSet::default(),
             queue: Vec::with_capacity(8),
+            callbacks: Vec::new(),
         }
     }
     pub fn push(&mut self, event: Event) {
@@ -32,9 +34,15 @@ impl EventManager {
         }
         self.queue.push(event);
     }
+    pub fn add_callback(&mut self, callback: EventCallback) {
+        self.callbacks.push(callback)
+    }
     pub fn process_events(&mut self) {
         for event in self.queue.iter().rev() {
-            log::info!("{:?}", event);
+            for cb in &self.callbacks {
+                let mut cb = cb.callback.lock();
+                (cb)(event);
+            }
         }
         self.queue.clear();
         self.queue.shrink_to(8);
