@@ -1,4 +1,3 @@
-mod sandbox_ecs;
 // use sandbox_ecs::SysPrintFps;
 
 use prismal::prelude::*;
@@ -11,6 +10,7 @@ struct SandboxApp {
 }
 
 #[rustfmt::skip]
+#[allow(dead_code)]
 const VERTICES: &[BasicVertex2d] = &[
     BasicVertex2d::new([-0.5,  0.5], [0.5, 0.0],[1.0, 0.0, 0.0, 1.0]), // TL
     BasicVertex2d::new([-0.5, -0.5], [0.0, 1.0],[1.0, 1.0, 0.0, 1.0]), // BL
@@ -19,6 +19,7 @@ const VERTICES: &[BasicVertex2d] = &[
 ];
 
 #[rustfmt::skip]
+#[allow(dead_code)]
 const INDICES: &[u16] = &[
     0, 1, 3,
     3, 1, 2,
@@ -26,76 +27,67 @@ const INDICES: &[u16] = &[
 
 impl AppCore for SandboxApp {
     fn start(&mut self) {
-        let world = get_world();
-        {
-            let mut events = world.fetch_mut::<EventManager>();
-            events.add_callback(EventCallback::new(|evt| {
-                log::info!("Event: {:?}", evt);
-            }));
-        }
+        // let shader_bytes = assets
+        //     .get_loaded::<LoadedBytesAsset>("assets/triangle.wgsl".asset_key())
+        //     .unwrap();
+        // let shader_source = String::from_utf8(shader_bytes.bytes.clone()).unwrap();
 
-        let assets = world.fetch::<Assets>();
-        let shader_bytes = assets
-            .get_loaded::<LoadedBytesAsset>("assets/triangle.wgsl".asset_key())
-            .unwrap();
-        let shader_source = String::from_utf8(shader_bytes.bytes.clone()).unwrap();
+        // drop(shader_bytes);
+        // drop(assets);
 
-        drop(shader_bytes);
-        drop(assets);
+        // let gfx_state = self.resources.get_mut::<GfxState>().unwrap();
+        // let pipeline_layout =
+        //     gfx_state
+        //         .device
+        //         .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        //             label: None,
+        //             bind_group_layouts: &[],
+        //             push_constant_ranges: &[],
+        //         });
+        // let surface_config = gfx_state.surface_config.borrow_int_mut().unwrap().clone();
 
-        let gfx_state = self.resources.get_mut::<GfxState>().unwrap();
-        let pipeline_layout =
-            gfx_state
-                .device
-                .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                    label: None,
-                    bind_group_layouts: &[],
-                    push_constant_ranges: &[],
-                });
-        let surface_config = gfx_state.surface_config.borrow_int_mut().unwrap().clone();
+        // let pipeline = Rc::new(
+        //     RenderPipelineBuilder::new()
+        //         .with_layout(&pipeline_layout)
+        //         .with_shader_source(&shader_source)
+        //         .push_vertex_buffer_layout::<BasicVertex2d>()
+        //         .push_color_target(wgpu::ColorTargetState {
+        //             blend: Some(wgpu::BlendState::REPLACE),
+        //             format: surface_config.format,
+        //             write_mask: wgpu::ColorWrites::ALL,
+        //         })
+        //         .build(&gfx_state.device)
+        //         .unwrap(),
+        // );
 
-        let pipeline = Rc::new(
-            RenderPipelineBuilder::new()
-                .with_layout(&pipeline_layout)
-                .with_shader_source(&shader_source)
-                .push_vertex_buffer_layout::<BasicVertex2d>()
-                .push_color_target(wgpu::ColorTargetState {
-                    blend: Some(wgpu::BlendState::REPLACE),
-                    format: surface_config.format,
-                    write_mask: wgpu::ColorWrites::ALL,
-                })
-                .build(&gfx_state.device)
-                .unwrap(),
-        );
+        // let vertex_buffer = Rc::new(SimpleBuffer::from_bytes(
+        //     &gfx_state.device,
+        //     bytemuck::cast_slice(VERTICES),
+        //     wgpu::BufferUsages::VERTEX,
+        // ));
+        // let index_buffer = Rc::new(SimpleBuffer::from_bytes(
+        //     &gfx_state.device,
+        //     bytemuck::cast_slice(INDICES),
+        //     wgpu::BufferUsages::INDEX,
+        // ));
+        // gfx_state.set_render_callback(move |rp| {
+        //     let pipeline = pipeline.clone();
+        //     let pipeline = Rc::as_ptr(&pipeline);
 
-        let vertex_buffer = Rc::new(SimpleBuffer::from_bytes(
-            &gfx_state.device,
-            bytemuck::cast_slice(VERTICES),
-            wgpu::BufferUsages::VERTEX,
-        ));
-        let index_buffer = Rc::new(SimpleBuffer::from_bytes(
-            &gfx_state.device,
-            bytemuck::cast_slice(INDICES),
-            wgpu::BufferUsages::INDEX,
-        ));
-        gfx_state.set_render_callback(move |rp| {
-            let pipeline = pipeline.clone();
-            let pipeline = Rc::as_ptr(&pipeline);
+        //     let vertex_buffer = vertex_buffer.clone();
+        //     let vertex_buffer = Rc::as_ptr(&vertex_buffer);
 
-            let vertex_buffer = vertex_buffer.clone();
-            let vertex_buffer = Rc::as_ptr(&vertex_buffer);
+        //     let index_buffer = index_buffer.clone();
+        //     let index_buffer = Rc::as_ptr(&index_buffer);
 
-            let index_buffer = index_buffer.clone();
-            let index_buffer = Rc::as_ptr(&index_buffer);
-
-            rp.set_pipeline(unsafe { &*pipeline });
-            rp.set_vertex_buffer(0, unsafe { (*vertex_buffer).buffer.slice(..) });
-            rp.set_index_buffer(
-                unsafe { (*index_buffer).buffer.slice(..) },
-                wgpu::IndexFormat::Uint16,
-            );
-            rp.draw_indexed(0..(INDICES.len() as u32), 0, 0..1);
-        });
+        //     rp.set_pipeline(unsafe { &*pipeline });
+        //     rp.set_vertex_buffer(0, unsafe { (*vertex_buffer).buffer.slice(..) });
+        //     rp.set_index_buffer(
+        //         unsafe { (*index_buffer).buffer.slice(..) },
+        //         wgpu::IndexFormat::Uint16,
+        //     );
+        //     rp.draw_indexed(0..(INDICES.len() as u32), 0, 0..1);
+        // });
     }
 
     fn info<'i>(&self) -> AppInfo<'i> {
@@ -124,25 +116,6 @@ impl AppFactory for SandboxApp {
         unsync_rc_mut(Self {
             resources: AppResources::new(),
         })
-    }
-}
-
-impl AppEcs for SandboxApp {
-    fn ecs_initializers() -> Vec<Box<dyn EcsInitializer>> {
-        struct SandboxEcsInitializer;
-        impl EcsInitializer for SandboxEcsInitializer {
-            fn setup_tick_dispatcher<'a, 'b>(
-                &self,
-                builder: DispatcherBuilder<'a, 'b>,
-            ) -> DispatcherBuilder<'a, 'b> {
-                // builder.with(SysPrintFps, "app_sys_print_fps", &[])
-                builder
-            }
-
-            fn setup_world(&self, _world: &mut World) {}
-        }
-
-        vec![Box::new(SandboxEcsInitializer)]
     }
 }
 

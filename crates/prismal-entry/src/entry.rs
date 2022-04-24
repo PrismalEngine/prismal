@@ -1,18 +1,17 @@
-use prismal_app_core::traits::{AppCore, AppEcs, AppFactory};
-use prismal_assets::prelude::Assets;
+use prismal_app_core::traits::{AppCore, AppFactory};
+// use prismal_assets::prelude::Assets;
 use prismal_gfx::state::GfxState;
 use prismal_platform_init::init::initialize_platform;
+#[allow(unused_imports)]
+use prismal_utils::futures::futures::future::join_all;
 use prismal_utils::interior_mut::InteriorMut;
 use prismal_window::prelude::*;
 
-use prismal_ecs::prelude::*;
-
-use crate::ecs::*;
 use crate::event_handler::handle_event;
 
 /// Prismal Engine entry point
 #[allow(clippy::await_holding_refcell_ref)]
-pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
+pub async fn entry<A: AppCore + AppFactory + 'static>() {
     initialize_platform();
     let app = A::make_app();
 
@@ -30,36 +29,12 @@ pub async fn entry<A: AppCore + AppFactory + AppEcs + 'static>() {
         app.resources_mut().insert(gfx);
     }
 
-    let mut world = create_world::<A>();
-    let mut tick_dispatcher = create_tick_dispatcher::<A>();
-    tick_dispatcher.setup(&mut world);
-
-    let mut early_tick_dispatcher = create_early_tick_dispatcher::<A>();
-    early_tick_dispatcher.setup(&mut world);
-
-    set_world(world);
-
-    {
-        let app = app.borrow_int_mut().unwrap();
-        let world = get_world();
-        let mut assets = world.fetch_mut::<Assets>();
-        for p in app.preload_asset_paths() {
-            assets.load_bytes(p).await;
-        }
-    }
-
     {
         let mut app = app.borrow_int_mut().unwrap();
         app.start();
     }
 
     event_loop.run(move |event, _, flow| {
-        handle_event(
-            app.clone(),
-            &mut tick_dispatcher,
-            &mut early_tick_dispatcher,
-            event,
-            flow,
-        );
+        handle_event(app.clone(), event, flow);
     });
 }

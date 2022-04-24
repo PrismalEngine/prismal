@@ -8,16 +8,14 @@ use prismal_window::prelude::*;
 use winit::event::ElementState;
 use winit::event::MouseButton;
 
-use prismal_ecs::prelude::*;
-
+#[allow(unused_imports)]
 use prismal_events::event::base_event::Event;
+#[allow(unused_imports)]
 use prismal_events::manager::EventManager;
 
 /// Handle a `winit` event
 pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     app: UnsyncRcMut<A>,
-    tick_dispatcher: &mut Dispatcher<'a, 'b>,
-    early_tick_dispatcher: &mut Dispatcher<'a, 'b>,
     event: WinitEvent<()>,
     flow: &mut ControlFlow,
 ) {
@@ -46,12 +44,8 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
     }
 
     {
-        let event = Event::try_from_winit(&event);
-        if let Ok(event) = event {
-            let world = get_world();
-            let mut event_manager = world.fetch_mut::<EventManager>();
-            event_manager.push(event);
-        }
+        // let event = Event::try_from_winit(&event);
+        // if let Ok(event) = event {}
     }
     match &event {
         WinitEvent::WindowEvent { event, .. } => match event {
@@ -80,28 +74,20 @@ pub fn handle_event<'a, 'b, A: AppCore + 'static>(
             _ => {}
         },
         WinitEvent::MainEventsCleared => {
-            {
-                let app_ref = app.borrow_int_mut().unwrap();
-                let gfx = app_ref.resources().get::<GfxState>().unwrap();
-                if let Err(err) = gfx.render() {
-                    match err {
-                        SurfaceError::Outdated | SurfaceError::Lost => resize_gfx_current(app_ref),
-                        SurfaceError::OutOfMemory => {
-                            log::error!("GPU out of memory!");
-                            panic!("{:?}", err);
-                        }
-                        _ => {
-                            log::error!("Surface Error: {:?}", err);
-                            panic!("{:?}", err);
-                        }
+            let app_ref = app.borrow_int_mut().unwrap();
+            let gfx = app_ref.resources().get::<GfxState>().unwrap();
+            if let Err(err) = gfx.render() {
+                match err {
+                    SurfaceError::Outdated | SurfaceError::Lost => resize_gfx_current(app_ref),
+                    SurfaceError::OutOfMemory => {
+                        log::error!("GPU out of memory!");
+                        panic!("{:?}", err);
+                    }
+                    _ => {
+                        log::error!("Surface Error: {:?}", err);
+                        panic!("{:?}", err);
                     }
                 }
-            }
-
-            {
-                let world = get_world();
-                early_tick_dispatcher.dispatch(world);
-                tick_dispatcher.dispatch(world);
             }
         }
         _ => {}

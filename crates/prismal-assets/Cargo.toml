@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 prismal-assets-core = { version = "0.1.0", path = "../prismal-assets-core" }
-prismal-ecs-core = { version = "0.1.0", path = "../prismal-ecs-core" }
 prismal-utils = { version = "0.1.0", path = "../prismal-utils" }

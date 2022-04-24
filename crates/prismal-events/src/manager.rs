@@ -12,6 +12,7 @@ pub struct EventManager {
 }
 
 impl EventManager {
+    #[allow(dead_code)]
     pub(crate) fn new() -> Self {
         Self {
             pressed_keys: HashSet::default(),

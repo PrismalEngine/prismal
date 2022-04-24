@@ -1,1 +1,2 @@
-pub use pollster::block_on;
+pub use futures;
+pub use futures::executor::block_on;
