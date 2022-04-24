@@ -1,0 +1,10 @@
+# Custom Dictionary Words
+prismal
+clippy
+rustfmt
+unclipped
+unsync
+webgl
+wgpu
+wgsl
+winit

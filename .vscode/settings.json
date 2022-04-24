@@ -3,14 +3,7 @@
         "editor.formatOnSave": true
     },
     "cSpell.words": [
-        "prismal",
-        "rustfmt",
-        "unclipped",
-        "unsync",
-        "webgl",
-        "wgpu",
-        "Wgsl",
-        "Winit"
+
     ],
     "rust-analyzer.checkOnSave.command": "clippy",
     "rust-analyzer.cargo.target": "wasm32-unknown-unknown"
