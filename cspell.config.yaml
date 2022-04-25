@@ -1,5 +1,7 @@
 version: "0.2"
-ignorePaths: []
+ignorePaths: [
+  ".github/**/*"
+]
 dictionaryDefinitions:
   - name: custom-dictionary
     path: ./.cspell/custom-dictionary.txt
