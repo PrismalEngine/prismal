@@ -1,11 +1,11 @@
-use wasm_bindgen_test::*;
-
 use prismal_ecs::component::storage::component_storage::ComponentStorage;
 use prismal_ecs::component::storage::hash_map_component_storage::HashMapComponentStorage;
 use prismal_ecs::component::*;
 use prismal_ecs::entity::Entity;
 
 use prismal_utils::string::key::KString;
+
+use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -24,12 +24,12 @@ impl Component for TestComponentA {
 fn test_component_trait_object() {
     let entity = Entity::from_index(1);
 
-    let mut storage = <TestComponentA as Component>::Storage::new();
+    let storage = <TestComponentA as Component>::Storage::new();
     storage.insert(
         entity,
         TestComponentA(KString::from_ref("key_test_comp_a"), 42),
     );
 
-    let comp: &dyn AnyComponent = storage.get_ref(entity).unwrap();
+    let comp: &dyn AnyComponent = &storage.get(entity).unwrap();
     assert_eq!(comp.key(), "key_test_comp_a");
 }
