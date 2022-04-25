@@ -8,3 +8,11 @@ webgl
 wgpu
 wgsl
 winit
+bindgen
+wasm
+hasher
+kstring
+repr
+serde
+bytemuck
+xxhash

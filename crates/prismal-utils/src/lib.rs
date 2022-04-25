@@ -4,4 +4,5 @@ pub mod hash;
 pub mod interior_mut;
 pub mod prelude;
 pub mod shared;
+pub mod string;
 pub mod sync;
