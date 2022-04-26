@@ -34,7 +34,7 @@ impl<T: ComponentKey + Clone> ComponentStorage for HashMapComponentStorage<T> {
         let mut map = self.map.lock();
         match map.entry(entity) {
             std::collections::hash_map::Entry::Occupied(entry) => {
-                if component_key == entry.get().key() {
+                if component_key == entry.get().component_key() {
                     entry.remove();
                 }
             }

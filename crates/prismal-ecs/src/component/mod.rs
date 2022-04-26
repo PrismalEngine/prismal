@@ -17,7 +17,7 @@ pub trait AnyComponent: AnySync {
 }
 impl<T: ComponentStorage<Stored = Self>, C: Component<Storage = T> + 'static> AnyComponent for C {
     fn key(&self) -> KString {
-        self.key()
+        self.component_key()
     }
 }
 downcast::downcast_sync!(dyn AnyComponent);

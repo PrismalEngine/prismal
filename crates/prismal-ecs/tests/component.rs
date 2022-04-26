@@ -13,7 +13,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 struct TestComponentA(KString, i32);
 
 impl ComponentKey for TestComponentA {
-    fn key(&self) -> KString {
+    fn component_key(&self) -> KString {
         self.0.clone()
     }
 }

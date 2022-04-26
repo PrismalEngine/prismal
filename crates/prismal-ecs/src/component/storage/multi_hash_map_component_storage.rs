@@ -42,7 +42,7 @@ impl<T: ComponentKey + Clone> ComponentStorage for MultiHashMapComponentStorage<
         match map.entry(entity) {
             Entry::Occupied(mut entry) => {
                 let comps = entry.get_mut();
-                comps.retain(|e| e.key() != component_key);
+                comps.retain(|e| e.component_key() != component_key);
                 if comps.is_empty() {
                     entry.remove();
                 }
