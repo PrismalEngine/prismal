@@ -1,14 +1,15 @@
+pub mod key;
 pub mod storage;
 
 use downcast::AnySync;
 
 use prismal_utils::string::key::KString;
 
+pub use key::ComponentKey;
 use storage::component_storage::ComponentStorage;
 
-pub trait Component: Sized + Send + Sync {
+pub trait Component: ComponentKey + Sized + Send + Sync {
     type Storage: ComponentStorage<Stored = Self>;
-    fn key(&self) -> KString;
 }
 
 pub trait AnyComponent: AnySync {

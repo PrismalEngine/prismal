@@ -1,5 +1,6 @@
 pub use crate::component::AnyComponent;
 pub use crate::component::Component;
+pub use crate::component::ComponentKey;
 
 pub use crate::component::storage::component_storage::AnyComponentStorage;
 pub use crate::component::storage::component_storage::ComponentStorage;

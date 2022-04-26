@@ -13,21 +13,25 @@ wasm_bindgen_test_configure!(run_in_browser);
 #[derive(Debug, Clone, Default)]
 struct TestComponentA(KString, i32);
 
-impl Component for TestComponentA {
-    type Storage = HashMapComponentStorage<Self>;
+impl ComponentKey for TestComponentA {
     fn key(&self) -> KString {
         self.0.clone()
     }
+}
+impl Component for TestComponentA {
+    type Storage = HashMapComponentStorage<Self>;
 }
 
 #[derive(Debug, Clone, Default)]
 struct TestComponentB(KString, f32);
 
-impl Component for TestComponentB {
-    type Storage = MultiHashMapComponentStorage<Self>;
+impl ComponentKey for TestComponentB {
     fn key(&self) -> KString {
         self.0.clone()
     }
+}
+impl Component for TestComponentB {
+    type Storage = MultiHashMapComponentStorage<Self>;
 }
 
 #[test]
@@ -46,23 +50,4 @@ fn test_ecs_world_register_component() {
     let storage_b = storage_b.unwrap();
     assert!(storage_a.is_empty());
     assert!(storage_b.is_empty());
-
-    let ent_1 = world.spawn_entity();
-    let ent_2 = world.spawn_entity();
-
-    let comp_a0 = TestComponentA(KString::from_ref("ent_1:comp_a0"), 42);
-    let comp_a1 = TestComponentA(KString::from_ref("ent_2:comp_a1"), 21);
-    let comp_a2 = TestComponentA(KString::from_ref("ent_2:comp_a2"), 12);
-
-    storage_a.insert(ent_1, comp_a0);
-    storage_a.insert(ent_2, comp_a1);
-    storage_a.insert(ent_2, comp_a2);
-    assert_eq!(storage_a.len(), 2);
-
-    let comp_b0 = TestComponentB(KString::from_ref("ent_1:comp_b0"), 1.5);
-    let comp_b1 = TestComponentB(KString::from_ref("ent_1:comp_b1"), -0.5);
-
-    storage_b.insert(ent_1, comp_b0);
-    storage_b.insert(ent_1, comp_b1);
-    assert_eq!(storage_b.len(), 2);
 }

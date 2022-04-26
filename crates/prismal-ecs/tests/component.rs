@@ -12,11 +12,13 @@ wasm_bindgen_test_configure!(run_in_browser);
 #[derive(Debug, Clone, Default)]
 struct TestComponentA(KString, i32);
 
-impl Component for TestComponentA {
-    type Storage = HashMapComponentStorage<Self>;
+impl ComponentKey for TestComponentA {
     fn key(&self) -> KString {
         self.0.clone()
     }
+}
+impl Component for TestComponentA {
+    type Storage = HashMapComponentStorage<Self>;
 }
 
 #[test]
