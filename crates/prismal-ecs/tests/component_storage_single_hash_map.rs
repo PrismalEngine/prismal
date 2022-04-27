@@ -135,3 +135,81 @@ fn test_ecs_component_storage_remove_entity_single_hash() {
         assert!(ent_2_comps.clone().next().is_none());
     }
 }
+
+#[test]
+#[wasm_bindgen_test]
+fn test_ecs_component_storage_remove_entity_component_single_hash() {
+    let TestContext {
+        storage,
+        ent_0,
+        ent_1,
+        ent_2,
+        ..
+    } = setup_test::<TestComponentSingleHash, <TestComponentSingleHash as Component>::Storage>();
+
+    // Before any remove
+    {
+        let ent_0_comps = storage.get(ent_0);
+        let ent_0_comps = ent_0_comps.into_iter();
+        assert_eq!(ent_0_comps.clone().count(), 1);
+
+        let ent_1_comps = storage.get(ent_1);
+        let ent_1_comps = ent_1_comps.into_iter();
+        assert_eq!(ent_1_comps.clone().count(), 1);
+
+        let ent_2_comps = storage.get(ent_2);
+        let ent_2_comps = ent_2_comps.into_iter();
+        assert_eq!(ent_2_comps.clone().count(), 0);
+    }
+
+    storage.remove_entity_component(ent_0, KString::from_ref("ent_0:comp_0a"));
+
+    // After remove ent_0:comp_0a
+    {
+        let ent_0_comps = storage.get(ent_0);
+        let ent_0_comps = ent_0_comps.into_iter();
+        assert_eq!(ent_0_comps.clone().count(), 1);
+
+        let ent_1_comps = storage.get(ent_1);
+        let ent_1_comps = ent_1_comps.into_iter();
+        assert_eq!(ent_1_comps.clone().count(), 1);
+
+        let ent_2_comps = storage.get(ent_2);
+        let ent_2_comps = ent_2_comps.into_iter();
+        assert_eq!(ent_2_comps.clone().count(), 0);
+    }
+
+    storage.remove_entity_component(ent_0, KString::from_ref("ent_0:comp_0b"));
+
+    // After remove ent_0:comp_0b
+    {
+        let ent_0_comps = storage.get(ent_0);
+        let ent_0_comps = ent_0_comps.into_iter();
+        assert_eq!(ent_0_comps.clone().count(), 0);
+
+        let ent_1_comps = storage.get(ent_1);
+        let ent_1_comps = ent_1_comps.into_iter();
+        assert_eq!(ent_1_comps.clone().count(), 1);
+
+        let ent_2_comps = storage.get(ent_2);
+        let ent_2_comps = ent_2_comps.into_iter();
+        assert_eq!(ent_2_comps.clone().count(), 0);
+    }
+
+    storage.remove_entity_component(ent_1, KString::from_ref("ent_1:comp_1"));
+
+    // After remove ent_1:comp_1
+    {
+        let ent_0_comps = storage.get(ent_0);
+        let ent_0_comps = ent_0_comps.into_iter();
+        assert_eq!(ent_0_comps.clone().count(), 0);
+
+        let ent_1_comps = storage.get(ent_1);
+        let ent_1_comps = ent_1_comps.into_iter();
+        assert_eq!(ent_1_comps.clone().count(), 0);
+
+        let ent_2_comps = storage.get(ent_2);
+        let ent_2_comps = ent_2_comps.into_iter();
+        assert_eq!(ent_2_comps.clone().count(), 0);
+    }
+}
