@@ -1,5 +1,14 @@
 repos:
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v5
+    rev: v5.9.1
     hooks:
       - id: cspell
+  - repo: local
+    hooks:
+    - id: cargo-workspace-test
+      name: cargo-workspace-test
+      entry: ./.git-hooks/cargo-workspace.sh
+      args:
+        - "test"
+      types: [rust]
+      language: script
