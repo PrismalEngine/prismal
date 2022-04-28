@@ -3,6 +3,7 @@ use prismal_ecs::component::storage::hash_map_component_storage::HashMapComponen
 use prismal_ecs::component::*;
 use prismal_ecs::entity::Entity;
 
+use prismal_utils::shared::RcMut;
 use prismal_utils::string::key::KString;
 
 use wasm_bindgen_test::*;
@@ -32,6 +33,5 @@ fn test_component_trait_object() {
         TestComponentA(KString::from_ref("key_test_comp_a"), 42),
     );
 
-    let comp: &dyn AnyComponent = &storage.get(entity).unwrap();
-    assert_eq!(comp.key(), "key_test_comp_a");
+    let comp_arc = storage.get(entity).unwrap();
 }

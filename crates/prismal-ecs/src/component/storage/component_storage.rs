@@ -1,5 +1,6 @@
 use downcast::AnySync;
 
+use prismal_utils::shared::RcMut;
 use prismal_utils::string::key::KString;
 
 use crate::component::ComponentKey;
@@ -7,7 +8,7 @@ use crate::entity::Entity;
 
 pub trait ComponentStorage: Send + Sync {
     type Stored: ComponentKey + Clone;
-    type IntoIter: IntoIterator<Item = Self::Stored>;
+    type IntoIter: IntoIterator<Item = RcMut<Self::Stored>>;
 
     fn new() -> Self;
     fn insert(&self, entity: Entity, component: Self::Stored);

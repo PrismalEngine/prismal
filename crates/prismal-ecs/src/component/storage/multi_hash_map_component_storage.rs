@@ -2,6 +2,8 @@ use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
 use prismal_utils::hash::int::IntHasherBuilder;
+use prismal_utils::prelude::InteriorMut;
+use prismal_utils::shared::{rc_mut, RcMut};
 use prismal_utils::string::key::KString;
 use prismal_utils::sync::Mutex;
 
@@ -10,12 +12,12 @@ use crate::component::ComponentKey;
 use crate::entity::Entity;
 
 pub struct MultiHashMapComponentStorage<T: ComponentKey + Clone> {
-    map: Mutex<HashMap<Entity, Vec<T>, IntHasherBuilder>>,
+    map: Mutex<HashMap<Entity, Vec<RcMut<T>>, IntHasherBuilder>>,
 }
 
 impl<T: ComponentKey + Clone> ComponentStorage for MultiHashMapComponentStorage<T> {
     type Stored = T;
-    type IntoIter = Vec<T>;
+    type IntoIter = Vec<RcMut<T>>;
 
     fn new() -> Self {
         Self {
@@ -26,10 +28,10 @@ impl<T: ComponentKey + Clone> ComponentStorage for MultiHashMapComponentStorage<
         let mut map = self.map.lock();
         match map.entry(entity) {
             Entry::Occupied(mut entry) => {
-                entry.get_mut().push(component);
+                entry.get_mut().push(rc_mut(component));
             }
             Entry::Vacant(entry) => {
-                entry.insert(vec![component]);
+                entry.insert(vec![rc_mut(component)]);
             }
         }
     }
@@ -42,7 +44,10 @@ impl<T: ComponentKey + Clone> ComponentStorage for MultiHashMapComponentStorage<
         match map.entry(entity) {
             Entry::Occupied(mut entry) => {
                 let comps = entry.get_mut();
-                comps.retain(|e| e.component_key() != component_key);
+                comps.retain(|e| {
+                    let e = e.borrow_int_mut().unwrap();
+                    e.component_key() != component_key
+                });
                 if comps.is_empty() {
                     entry.remove();
                 }
